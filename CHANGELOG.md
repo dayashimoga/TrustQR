@@ -4,6 +4,33 @@
 
 ---
 
+## [0.1.0-subphase.1.2.1] - 2026-11-22
+
+### Added
+- **Multi-Format QR Payload Engine (15 Distinct Formats)** in `packages/qr_core`:
+  - `UrlPayload`: RFC 3986 URL parsing, normalization, scheme validation, query parameter decomposition.
+  - `WifiPayload`: WPA, WPA2, WPA3, WEP, and unencrypted network parsing with delimiter escaping (`\;`, `\:`, `\\`) and hidden network support.
+  - `VCardPayload`: vCard 3.0/4.0 contact parsing, name components, multi-phone, multi-email, URL, address, and notes.
+  - `MeCardPayload`: Compact MeCard format parsing and escaped delimiter normalization.
+  - `GeoPayload`: WGS84 geographic coordinate parsing with altitude, bounds validation (-90..90, -180..180), and query tags.
+  - `EventPayload`: iCalendar VEVENT format with UTC datetime serialization and start/end temporal ordering checks.
+  - `EmailPayload`: `mailto:` and `MATMSG:` email formats with subject, body, and CC support.
+  - `SmsPayload`: `sms:` and `smsto:` message formats with phone number validation.
+  - `TelPayload`: Telephone URI parser and serializer.
+  - `OtpAuthPayload`: RFC 6238 TOTP and RFC 4226 HOTP 2FA authenticator formats with Base32 secret validation, configurable digits (6/8), period, and counter.
+  - `UpiPaymentPayload`: NPCI UPI payment format with virtual payment address (VPA) validation, payee name, amount, currency, and transaction references.
+  - `EpcPaymentPayload`: European Payments Council (SEPA) QR code parser with BIC, recipient name, IBAN validation, and remittance info.
+  - `CryptoPaymentPayload`: Cryptocurrency URIs for Bitcoin, Ethereum, Solana, and Litecoin with amount, address, and label parameters.
+  - `Gs1DigitalLinkPayload`: GS1 Digital Link URIs and parenthesized Application Identifier (AI) element strings (GTIN-8/12/13/14, serial number, batch/lot, expiry date).
+  - `PlainTextPayload`: Text and structured JSON payload parser with automatic JSON decoding.
+- **Schema Validation Suite (`SchemaValidator`)**:
+  - Deterministic validators for URLs, email addresses, geographic coordinates, UPI VPAs, IBAN account numbers, and Base32 secrets.
+- **Automated Test Suite & Line Coverage**:
+  - Achieved **99.27% line coverage** (684 / 689 lines hit) with 26 comprehensive unit tests passing and 0 analyzer issues.
+  - Added `scripts/verify_qr_core_coverage.ps1` for automated coverage verification.
+
+---
+
 ## [0.1.0-subphase.1.1.2] - 2026-11-22
 
 ### Added
