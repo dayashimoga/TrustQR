@@ -1,0 +1,29 @@
+# Dart / Flutter
+.dart_tool/
+.packages
+build/
+pubspec.lock
+coverage/
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Platform ephemeral build outputs
+**/android/.gradle/
+**/android/captures/
+**/android/local.properties
+**/ios/Pods/
+**/ios/.symlinks/
+**/macos/Pods/
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+
+# Artifacts & temporary outputs
+dist/
+artifacts/
+*.log
+.DS_Store
+Thumbs.db
