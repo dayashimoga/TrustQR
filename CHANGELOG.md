@@ -4,6 +4,56 @@
 
 ---
 
+## [0.1.0-subphase.2.2.2] - 2026-11-22
+
+### Added
+- **Server-Side RBAC & Entitlement Authority** (`services/rbac_api`):
+  - **Ed25519 Institutional Key Authority (`RbacConfig`)**:
+    - Generates and manages the institutional Ed25519 keypair for issuing and verifying compact entitlement tokens and signing `TrustQR` envelopes.
+    - Pre-configured user and admin credentials with role-scoped authority.
+  - **In-Memory Thread-Safe State & Audit Store (`RbacStore`)**:
+    - In-memory revoked token registry (`jti` tracking).
+    - Append-only administrative audit log recording every authentication attempt, privilege check, QR generation, batch dispatch, template creation, and token revocation event.
+    - Fleet analytics aggregation: scans recorded, threats blocked, generations executed, TrustQR envelopes issued, and service uptime.
+    - Template repository pre-populated with default designs (*Cyberpunk Neon Matrix*, *Corporate Sleek Minimal*, *Institutional TrustQR Secure*).
+  - **Authentication & RBAC Middleware (`RbacMiddleware`, `AuthenticatedContext`)**:
+    - Validates incoming `Authorization: Bearer <token>` headers against server's public key.
+    - Rejects malformed tokens, expired tokens, revoked tokens, rogue keys, and tampered signatures with HTTP 401.
+    - Enforces `role: admin` and required scopes for all administrative and generation endpoints with HTTP 403.
+  - **Controller Routing & API Endpoints (`RbacRouter`, `RbacServer`)**:
+    - `GET /api/v1/health`: Public server health and uptime status.
+    - `GET /api/v1/trustqr/keys`: Public institutional Ed25519 public key endpoint in JWK format.
+    - `POST /api/v1/auth/token`: Exchanges valid credentials for an asymmetric `EntitlementToken`.
+    - `POST /api/v1/auth/verify`: Verifies arbitrary entitlement tokens against server's public key and revocation list.
+    - `POST /api/v1/auth/revoke`: Allows users to revoke their own token and admins to revoke any token.
+    - `POST /api/v1/telemetry/scan`: Authenticated telemetry ingestion endpoint accessible to both `user` and `admin`.
+    - `POST /api/v1/admin/qr/generate`: Admin-only single QR specification generation.
+    - `POST /api/v1/admin/qr/batch`: Admin-only batch QR specification generation.
+    - `POST /api/v1/admin/qr/sign`: Admin-only cryptographic TrustQR envelope signing with server's institutional key.
+    - `GET /api/v1/admin/templates` & `POST /api/v1/admin/templates`: Admin-only branded template management.
+    - `GET /api/v1/admin/analytics`: Admin-only fleet-wide scan, generation, and security analytics.
+    - `GET /api/v1/admin/audit`: Admin-only append-only audit trail retrieval with self-auditing read events.
+- **Automated Penetration & Security Test Suite** (`services/rbac_api/test/rbac_penetration_test.dart`):
+  - 11 adversarial penetration attack vectors tested across all protected endpoints:
+    1. Anonymous access rejection (HTTP 401 `AUTH_REQUIRED`).
+    2. Invalid authorization scheme rejection (HTTP 401 `AUTH_INVALID_SCHEME`).
+    3. Malformed and truncated token rejection (HTTP 401 `TOKEN_MALFORMED`).
+    4. Signature tampering rejection (HTTP 401 `TOKEN_INVALID`).
+    5. Privilege escalation via claim modification rejection (HTTP 401 `TOKEN_INVALID`).
+    6. Expired token rejection (HTTP 401 `TOKEN_EXPIRED`).
+    7. Revoked token rejection (HTTP 401 `TOKEN_REVOKED`).
+    8. Rogue untrusted key rejection (HTTP 401 `KEY_MISMATCH`).
+    9. Valid user role boundary enforcement (HTTP 403 `INSUFFICIENT_PERMISSIONS` on every admin route).
+    10. Authorized admin capability execution (HTTP 200/201 on all endpoints).
+    11. Input validation & bad request boundary testing (HTTP 400 `BAD_REQUEST`).
+- **Quality Gates & Coverage**:
+  - Achieved **98.06% line coverage** (455 / 464 lines hit) across `services/rbac_api`.
+  - 100% of automated tests pass (60 / 60 tests).
+  - 0 static analysis errors, warnings, or infos across all 8 monorepo targets.
+  - Added `scripts/verify_subphase_2_2_2.ps1` for automated gate enforcement.
+
+---
+
 ## [0.1.0-subphase.2.2.1] - 2026-11-22
 
 ### Added
