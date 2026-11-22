@@ -1,0 +1,19 @@
+name: qr_generator_engine
+description: Admin-only artistic QR matrix encoder, custom module shaders, gradients, logos, templates, and scannability simulator.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  qr_core:
+    path: ../qr_core
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

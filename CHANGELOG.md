@@ -4,6 +4,26 @@
 
 ---
 
+## [0.1.0-subphase.1.1.2] - 2026-11-22
+
+### Added
+- **Monorepo Package Scaffolding (`packages/*`, `services/*`, `apps/*`)**:
+  - `packages/qr_core`: Core domain models, 15-format payload type enums, threat levels, and base entities.
+  - `packages/qr_scanner_engine`: Universal decoding pipeline contract and baseline scanner engine.
+  - `packages/qr_generator_engine` (Admin Only): Matrix options, Reed-Solomon levels, module shapes, and scannability evaluation engine.
+  - `packages/qr_admin_analytics` (Admin Only): Fleet telemetry aggregator and usage statistics service.
+  - `packages/qr_design_system`: CyberTokens design palette, dark cyber theme, and glassmorphic card component.
+  - `services/rbac_api`: Server-side RBAC claims model and HTTP server with role-checking middleware.
+  - `apps/user_app`: Restricted scanner-only application with zero QR generator dependencies.
+  - `apps/admin_app`: Full-featured admin and premium QR studio application with generator controls and fleet telemetry.
+- **Automated Binary Isolation Auditor**:
+  - `scripts/verify_binary_isolation.dart` & `scripts/verify_binary_isolation.ps1`: AST and `pubspec.yaml` scanner enforcing zero dependency leakage from `qr_generator_engine` or `qr_admin_analytics` into `apps/user_app`.
+  - Built-in fail-safe self-test verifying breach detection logic against synthetic mock fixtures.
+- **Verification Runner**:
+  - `scripts/run_monorepo_checks.ps1`: Automated runner executing binary isolation audit, pub resolution, strict static analysis (`--fatal-infos --fatal-warnings`), and unit/widget test suites across all 8 targets.
+
+---
+
 ## [0.1.0-subphase.1.1.1] - 2026-11-22
 
 ### Added

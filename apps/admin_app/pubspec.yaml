@@ -1,0 +1,30 @@
+name: admin_app
+description: Full-featured admin and premium QR studio, scanner, customization, batch generation, and analytics application.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: '>=3.10.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  qr_core:
+    path: ../../packages/qr_core
+  qr_scanner_engine:
+    path: ../../packages/qr_scanner_engine
+  qr_generator_engine:
+    path: ../../packages/qr_generator_engine
+  qr_admin_analytics:
+    path: ../../packages/qr_admin_analytics
+  qr_design_system:
+    path: ../../packages/qr_design_system
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true

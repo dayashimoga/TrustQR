@@ -1,0 +1,12 @@
+name: qr_core
+description: Core domain models, 15+ payload parsers, Ed25519 TrustQR cryptography, and offline storage models.
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dev_dependencies:
+  test: ^1.24.0
+  lints: ^2.1.0
+
