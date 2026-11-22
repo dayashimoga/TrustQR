@@ -1,4 +1,4 @@
-﻿# Universal QR Platform — Master Verification Gate for Subphase 6.1.2
+# Universal QR Platform — Master Verification Gate for Subphase 6.1.2
 # Verifies GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector),
 # binary isolation, native runners, static analysis, and standalone packaging scripts.
 
