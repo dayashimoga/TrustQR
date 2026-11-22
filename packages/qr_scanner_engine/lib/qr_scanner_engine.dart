@@ -2,17 +2,24 @@
 library qr_scanner_engine;
 
 import 'package:qr_core/qr_core.dart';
+import 'src/security/threat_assessment.dart';
+import 'src/security/qr_threat_firewall.dart';
+
+export 'src/security/threat_assessment.dart';
+export 'src/security/qr_threat_firewall.dart';
 
 /// Configuration options for scanning pipelines.
 class ScannerOptions {
   final bool enableThreatFirewall;
   final bool enableBatchDetection;
   final bool autoCopyResult;
+  final Map<String, CryptoPublicKey>? trustedInstitutionalKeys;
 
   const ScannerOptions({
     this.enableThreatFirewall = true,
     this.enableBatchDetection = false,
     this.autoCopyResult = false,
+    this.trustedInstitutionalKeys,
   });
 }
 
@@ -21,6 +28,7 @@ class ScanDecodeResult {
   final String rawContent;
   final QrPayloadType payloadType;
   final SecurityThreatLevel threatLevel;
+  final ThreatAssessment threatAssessment;
   final double confidence;
   final DateTime timestamp;
 
@@ -28,6 +36,7 @@ class ScanDecodeResult {
     required this.rawContent,
     required this.payloadType,
     required this.threatLevel,
+    required this.threatAssessment,
     this.confidence = 1.0,
     required this.timestamp,
   });
@@ -38,54 +47,44 @@ abstract class QrScannerEngine {
   Future<ScanDecodeResult> decodeFromRawString(String content, {ScannerOptions? options});
 }
 
-/// Default implementation of [QrScannerEngine].
+/// Default implementation of [QrScannerEngine] backed by [QrThreatFirewall].
 class DefaultQrScannerEngine implements QrScannerEngine {
   final ScannerOptions defaultOptions;
+  final QrThreatFirewall _firewall;
 
-  const DefaultQrScannerEngine({this.defaultOptions = const ScannerOptions()});
+  DefaultQrScannerEngine({
+    this.defaultOptions = const ScannerOptions(),
+    QrThreatFirewall? firewall,
+  }) : _firewall = firewall ?? QrThreatFirewall(trustedInstitutionalKeys: defaultOptions.trustedInstitutionalKeys ?? {});
 
   @override
   Future<ScanDecodeResult> decodeFromRawString(String content, {ScannerOptions? options}) async {
     final opts = options ?? defaultOptions;
-    final payloadType = _detectPayloadType(content);
-    final threatLevel = opts.enableThreatFirewall
-        ? _inspectThreat(content, payloadType)
-        : SecurityThreatLevel.safe;
+    final payloadType = QrPayloadParser.detectType(content);
+
+    ThreatAssessment assessment;
+    if (opts.enableThreatFirewall) {
+      assessment = _firewall.inspectRaw(
+        content,
+        customTrustedKeys: opts.trustedInstitutionalKeys,
+      );
+    } else {
+      assessment = const ThreatAssessment(
+        safetyScore: 100,
+        threatLevel: SecurityThreatLevel.safe,
+        findings: [],
+        isActionAllowed: true,
+        summary: 'Firewall inspection bypassed by scanner configuration.',
+      );
+    }
 
     return ScanDecodeResult(
       rawContent: content,
       payloadType: payloadType,
-      threatLevel: threatLevel,
+      threatLevel: assessment.threatLevel,
+      threatAssessment: assessment,
       confidence: 1.0,
       timestamp: DateTime.now(),
     );
-  }
-
-  QrPayloadType _detectPayloadType(String raw) {
-    final lower = raw.toLowerCase().trim();
-    if (lower.startsWith('http://') || lower.startsWith('https://')) return QrPayloadType.url;
-    if (lower.startsWith('wifi:')) return QrPayloadType.wifi;
-    if (lower.startsWith('begin:vcard')) return QrPayloadType.vcard;
-    if (lower.startsWith('mecard:')) return QrPayloadType.mecard;
-    if (lower.startsWith('geo:')) return QrPayloadType.geo;
-    if (lower.startsWith('begin:vevent')) return QrPayloadType.event;
-    if (lower.startsWith('mailto:') || lower.startsWith('matmsg:')) return QrPayloadType.email;
-    if (lower.startsWith('sms:') || lower.startsWith('smsto:')) return QrPayloadType.sms;
-    if (lower.startsWith('tel:')) return QrPayloadType.tel;
-    if (lower.startsWith('otpauth://')) return QrPayloadType.otpauth;
-    if (lower.startsWith('upi://')) return QrPayloadType.upi;
-    if (lower.startsWith('bitcoin:') || lower.startsWith('ethereum:')) return QrPayloadType.crypto;
-    return QrPayloadType.plainText;
-  }
-
-  SecurityThreatLevel _inspectThreat(String raw, QrPayloadType type) {
-    final lower = raw.toLowerCase().trim();
-    if (lower.contains('javascript:') || lower.contains('data:text/html') || lower.contains('vbscript:')) {
-      return SecurityThreatLevel.critical;
-    }
-    if (lower.startsWith('http://')) {
-      return SecurityThreatLevel.caution;
-    }
-    return SecurityThreatLevel.safe;
   }
 }

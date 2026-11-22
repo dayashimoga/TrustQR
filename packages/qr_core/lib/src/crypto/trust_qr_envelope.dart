@@ -128,6 +128,14 @@ class TrustQrEnvelope {
     return Uri(scheme: 'trustqr', host: version, queryParameters: params).toString();
   }
 
+  static Uint8List _decodeBase64UrlSafe(String src) {
+    var s = src.replaceAll('-', '+').replaceAll('_', '/');
+    while (s.length % 4 != 0) {
+      s += '=';
+    }
+    return Uint8List.fromList(base64Decode(s));
+  }
+
   /// Parses a `trustqr://` URI string into a [TrustQrEnvelope].
   static TrustQrEnvelope? tryParse(String raw) {
     try {
@@ -148,7 +156,7 @@ class TrustQrEnvelope {
         return null;
       }
 
-      final payload = utf8.decode(base64Url.decode(encodedPayload));
+      final payload = utf8.decode(_decodeBase64UrlSafe(encodedPayload));
       final createdAt = DateTime.parse(createdStr);
       final expiresAt = params['expires'] != null ? DateTime.parse(params['expires']!) : null;
       final algorithm = CryptoAlgorithm.values.byName(algStr);
@@ -207,7 +215,7 @@ class TrustQrEnvelope {
     );
 
     try {
-      final sigBytes = Uint8List.fromList(base64Url.decode(signature));
+      final sigBytes = _decodeBase64UrlSafe(signature);
       bool isSigValid = false;
 
       if (algorithm == CryptoAlgorithm.ed25519) {

@@ -28,7 +28,7 @@ class UserScannerHomePage extends StatefulWidget {
 }
 
 class _UserScannerHomePageState extends State<UserScannerHomePage> {
-  final QrScannerEngine _scanner = const DefaultQrScannerEngine();
+  final QrScannerEngine _scanner = DefaultQrScannerEngine();
   String _scanResult = 'No code scanned yet. Tap scan or enter payload below.';
   SecurityThreatLevel _threatLevel = SecurityThreatLevel.safe;
   final TextEditingController _inputController = TextEditingController();
