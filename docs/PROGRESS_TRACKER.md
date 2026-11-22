@@ -11,9 +11,9 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 8 / 24 (`33.33%`)
-- **Current Active Subphase**: `2.2.2` (`VERIFIED` — Server-Side RBAC & Entitlement Service)
-- **Next Subphase**: `3.1.1` (`PENDING` — Universal QR Decoding Pipeline)
+- **Verified Subphases**: 9 / 24 (`37.50%`)
+- **Current Active Subphase**: `3.1.1` (`VERIFIED` — Universal QR Decoding Pipeline)
+- **Next Subphase**: `3.1.2` (`PENDING` — Integrated Scan-to-Firewall-to-Vault Pipeline)
 - **Blocked Subphases**: 0
 
 ---
@@ -30,7 +30,7 @@
 | **2.1.2** | S2 / P2.1 | Threat Firewall Adversarial Benchmark & Security Verification Suite | 25 min | 14 min | `VERIFIED` | 100.00% line coverage (220/220 lines hit, 32/32 tests pass, 150-vector adversarial corpus, 0 analyzer issues) | `packages/qr_scanner_engine/test/adversarial/*`, `scripts/verify_subphase_2_1_2.ps1` |
 | **2.2.1** | S2 / P2.2 | Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search) | 35 min | 15 min | `VERIFIED` | 97.83% line coverage (1530/1564 lines hit, 64/64 tests pass, 0 analyzer issues) | `packages/qr_core/lib/src/vault/*`, `packages/qr_core/test/vault_test.dart`, `scripts/verify_subphase_2_2_1.ps1` |
 | **2.2.2** | S2 / P2.2 | Server-Side RBAC & Entitlement Service (`services/rbac_api`) + Penetration Tests | 40 min | 15 min | `VERIFIED` | 98.06% line coverage (455/464 lines hit, 60/60 tests pass, 100% penetration suite, 0 analyzer issues) | `services/rbac_api/lib/*`, `services/rbac_api/test/*`, `scripts/verify_subphase_2_2_2.ps1` |
-| **3.1.1** | S3 / P3.1 | Universal QR Decoding Pipeline (Camera, Image, File, Multi-QR Batch Matrix Vision) | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **3.1.1** | S3 / P3.1 | Universal QR Decoding Pipeline (Camera, Image, File, Multi-QR Batch Matrix Vision) | 40 min | 16 min | `VERIFIED` | 99.36% line coverage (1237/1245 lines hit, 76/76 tests pass, 0 analyzer issues) | `packages/qr_scanner_engine/lib/src/*`, `packages/qr_scanner_engine/test/decoding_pipeline_test.dart`, `scripts/verify_subphase_3_1_1.ps1` |
 | **3.1.2** | S3 / P3.1 | Integrated Scan-to-Firewall-to-Vault Pipeline & Decoding Performance Benchmarks | 30 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **3.2.1** | S3 / P3.2 | Admin-Only Artistic QR Matrix Encoder, Shaders, Gradients, Logos & Branded Templates | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **3.2.2** | S3 / P3.2 | Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |

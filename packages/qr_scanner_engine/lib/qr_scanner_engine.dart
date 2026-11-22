@@ -2,11 +2,21 @@
 library qr_scanner_engine;
 
 import 'package:qr_core/qr_core.dart';
+import 'src/engine/universal_qr_scanner_engine.dart';
 import 'src/security/threat_assessment.dart';
-import 'src/security/qr_threat_firewall.dart';
 
 export 'src/security/threat_assessment.dart';
 export 'src/security/qr_threat_firewall.dart';
+export 'src/image/image_buffer.dart';
+export 'src/image/image_file_decoder.dart';
+export 'src/decoder/galois_field.dart';
+export 'src/decoder/qr_format_info.dart';
+export 'src/decoder/qr_matrix_decoder.dart';
+export 'src/detector/finder_pattern.dart';
+export 'src/detector/qr_detector.dart';
+export 'src/detector/multi_qr_detector.dart';
+export 'src/isolate/isolate_qr_decoder.dart';
+export 'src/engine/universal_qr_scanner_engine.dart';
 
 /// Configuration options for scanning pipelines.
 class ScannerOptions {
@@ -47,44 +57,10 @@ abstract class QrScannerEngine {
   Future<ScanDecodeResult> decodeFromRawString(String content, {ScannerOptions? options});
 }
 
-/// Default implementation of [QrScannerEngine] backed by [QrThreatFirewall].
-class DefaultQrScannerEngine implements QrScannerEngine {
-  final ScannerOptions defaultOptions;
-  final QrThreatFirewall _firewall;
-
+/// Default implementation of [QrScannerEngine] backed by [UniversalQrScannerEngine].
+class DefaultQrScannerEngine extends UniversalQrScannerEngine {
   DefaultQrScannerEngine({
-    this.defaultOptions = const ScannerOptions(),
-    QrThreatFirewall? firewall,
-  }) : _firewall = firewall ?? QrThreatFirewall(trustedInstitutionalKeys: defaultOptions.trustedInstitutionalKeys ?? {});
-
-  @override
-  Future<ScanDecodeResult> decodeFromRawString(String content, {ScannerOptions? options}) async {
-    final opts = options ?? defaultOptions;
-    final payloadType = QrPayloadParser.detectType(content);
-
-    ThreatAssessment assessment;
-    if (opts.enableThreatFirewall) {
-      assessment = _firewall.inspectRaw(
-        content,
-        customTrustedKeys: opts.trustedInstitutionalKeys,
-      );
-    } else {
-      assessment = const ThreatAssessment(
-        safetyScore: 100,
-        threatLevel: SecurityThreatLevel.safe,
-        findings: [],
-        isActionAllowed: true,
-        summary: 'Firewall inspection bypassed by scanner configuration.',
-      );
-    }
-
-    return ScanDecodeResult(
-      rawContent: content,
-      payloadType: payloadType,
-      threatLevel: assessment.threatLevel,
-      threatAssessment: assessment,
-      confidence: 1.0,
-      timestamp: DateTime.now(),
-    );
-  }
+    super.defaultOptions,
+    super.firewall,
+  });
 }

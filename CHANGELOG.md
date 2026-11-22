@@ -4,6 +4,48 @@
 
 ---
 
+## [0.1.0-subphase.3.1.1] - 2026-11-22
+
+### Added
+- **Universal QR Decoding Pipeline (`packages/qr_scanner_engine`)**:
+  - **Raw Image Processing & Local Binarization** (`lib/src/image/image_buffer.dart`):
+    - `ImageBuffer` supporting RGBA, BGRA, RGB, and Grayscale formats with luminance computation, 90-degree rotations, cropping, and memory pooling.
+    - `AdaptiveBinarizer` implementing local 8x8 block thresholding (Otsu-adapted) that handles uneven lighting, shadows, and glares.
+    - `BinarizedBitMatrix` with bit-packed storage and bit-inversion (`inverted()`) for dark-mode QR support.
+  - **Galois Field & Reed-Solomon Error Correction** (`lib/src/decoder/galois_field.dart`):
+    - Pure-Dart $GF(2^8)$ arithmetic using ISO/IEC 18004 primitive polynomial $x^8 + x^4 + x^3 + x^2 + 1$ (0x11D).
+    - `ReedSolomonDecoder` with Berlekamp-Massey error locator polynomial solving, Chien root search, and Forney error evaluation with exact $b=0$ QR characteristic-2 correction.
+  - **Format Information & Error Detection** (`lib/src/decoder/qr_format_info.dart`):
+    - QR format information decoder with BCH(15, 5) error correction correcting up to 3 bit errors, masking with `0x5412`, and `decodeBestOfTwo` redundant sampling.
+  - **ISO/IEC 18004 QR Matrix Decoding** (`lib/src/decoder/qr_matrix_decoder.dart`):
+    - Unmasking all 8 standard QR patterns (0 through 7).
+    - Zig-zag codeword reading excluding finder eyes, separators, timing patterns, and alignment patterns.
+    - Reed-Solomon block de-interleaving and error correction across all standard block structures.
+    - Payload mode decoding for Numeric, Alphanumeric, and Byte modes with UTF-8 decoding and Latin-1 fallback.
+  - **Finder Pattern Vision Detection** (`lib/src/detector/finder_pattern.dart`, `lib/src/detector/qr_detector.dart`):
+    - Sub-pixel center estimation with 1:1:3:1:1 module ratio verification.
+    - Geometric triplet ordering (Top-Left, Top-Right, Bottom-Left) with cross-product orientation alignment.
+    - `PerspectiveTransform` with unit square to quadrilateral projective mapping and sub-pixel grid sampling.
+  - **Multi-QR Batch Matrix Vision** (`lib/src/detector/multi_qr_detector.dart`):
+    - Simultaneous detection and decoding of multiple QR codes in a single high-resolution image.
+    - Automatic dark-mode / inverted QR code detection fallback.
+  - **Uncompressed BMP File Decoder & Test Pattern Generator** (`lib/src/image/image_file_decoder.dart`):
+    - Pure-Dart standard BMP file decoder (24-bit, 32-bit, 8-bit palette) and encoder.
+    - Synthetic standards-compliant QR Version 1 (21x21) bit matrix and composite multi-QR image generator.
+  - **Background Isolate Offloading** (`lib/src/isolate/isolate_qr_decoder.dart`):
+    - Offloads CPU-intensive image binarization, perspective grid sampling, and decoding to background Dart isolates (`Isolate.run`), preventing UI thread jank.
+    - Graceful synchronous in-thread fallback for platforms or testing environments without isolate support.
+  - **Universal Facade Engine** (`lib/src/engine/universal_qr_scanner_engine.dart`):
+    - Single, unified API for decoding from raw strings, image buffers, file bytes, and batch collections.
+    - Seamless Zero-Trust firewall inspection integrated into every scan decode result.
+- **Automated Test Suite & Quality Gates**:
+  - Added `packages/qr_scanner_engine/test/decoding_pipeline_test.dart` (44 new unit and pipeline tests).
+  - Achieved **99.36% line coverage** (1237 / 1245 lines hit) across `packages/qr_scanner_engine`.
+  - Created automated verification script `scripts/verify_subphase_3_1_1.ps1`.
+  - Total 76 tests passing, 0 static analyzer issues across all 8 workspace targets, and 100% binary isolation maintained.
+
+---
+
 ## [0.1.0-subphase.2.2.2] - 2026-11-22
 
 ### Added
