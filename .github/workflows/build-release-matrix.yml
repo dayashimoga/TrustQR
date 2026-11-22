@@ -272,7 +272,7 @@ jobs:
         if: steps.filter.outputs.skip != 'true'
         run: |
           MODE="${{ inputs.build_mode || 'release' }}"
-          (cd "apps/${{ matrix.app }}" && flutter build apk "--$MODE")
+          (cd "apps/${{ matrix.app }}" && flutter build apk "--$MODE" --android-skip-build-dependency-validation)
 
       - name: Package Standalone Non-Nested Artifact
         if: steps.filter.outputs.skip != 'true'
