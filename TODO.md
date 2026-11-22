@@ -70,3 +70,21 @@
   - Verified 100% round-trip decoding across modes, shapes, templates, and BMP file exports using `UniversalQrScannerEngine`.
   - Quality Gates: Achieved **98.70% line coverage** (908/920 lines hit), 37/37 tests pass, 0 static analyzer issues, compile-time binary isolation verified. Automated gate script `scripts/verify_subphase_3_2_1.ps1`.
 - **[2026-11-22T11:28:30+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 3.2.2**: Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter.
+- **[2026-11-22T11:36:00+05:30] [START] Subphase 3.2.2**: Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter in `packages/qr_generator_engine`.
+  - Implement `ScannabilitySimulator`: Michelson contrast, WCAG luminance ratio, logo area vs Reed-Solomon budget, quiet-zone sufficiency, environmental lighting simulation, and round-trip decode verification scoring (0–100).
+  - Implement high-DPI PNG rasterizer with standard PNG chunks (IHDR, IDAT, IEND) and zlib compression.
+  - Implement standalone Vector SVG writer supporting all 6 module shapes, custom eyes, gradients, and logos.
+  - Implement print-ready vector PDF document generator (%PDF-1.4) with label and sheet layouts.
+  - Implement batch CSV/JSON-to-QR archive generator with progress reporting and ZIP container packaging.
+  - Verify mandatory >=95.0% line coverage and automated round-trip decoding via `UniversalQrScannerEngine`.
+- **[2026-11-22T11:52:00+05:30] [COMPLETED] Subphase 3.2.2**: Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter.
+  - Implemented `ScannabilitySimulator` with Michelson contrast $(L_{max} - L_{min}) / (L_{max} + L_{min})$, WCAG 2.1 contrast ratio, logo occlusion vs Reed-Solomon budget checks, quiet zone verification, and 5 environmental simulation stress scores (standard diffuse, high surface glare, low-light noise, 30° angle tilt, distance optical blur).
+  - Implemented pure-Dart high-DPI `PngExporter` with 8-byte PNG signature, `IHDR` (32-bit RGBA color type 6), `pHYs` custom DPI scaling (300 DPI), and `IDAT` deflated scanlines via `zlib.encode`.
+  - Implemented pure-Dart `Crc32` checksum calculator using IEEE 802.3 polynomial `0xEDB88320` and 256-word precomputed lookup table.
+  - Implemented resolution-independent `SvgExporter` generating XML `<svg>` with linear/radial `<defs>`, all 6 module shapes (`square`, `rounded`, `dots`, `diamond`, `liquid`, `cyberGrid`), custom finder eyes (`square`, `rounded`, `circle`, `squircle`, `hexagonal`), and embedded logo cutout vector paths.
+  - Implemented pure-Dart vector `PdfExporter` (%PDF-1.4) supporting `singleLabel` (4x4 inch centered label), `stickerSheet` (Letter 3x4 grid of 12 stickers), and `badgeCard` (CR80 credit-card attendee badge) with Helvetica and Helvetica-Bold typefaces and vector graphics operators.
+  - Implemented `BatchExporter` processing batch requests across PNG, SVG, PDF, and BMP formats with progress callbacks, item-level error isolation, automatic `manifest.json` generation, CSV parsing, JSON parsing, and pure-Dart PKZIP 2.0 container writer (`toZipArchive`).
+  - Extended `ImageFileDecoder` in `packages/qr_scanner_engine` to support decoding PNG file bytes.
+  - Verified 100% round-trip machine vision decoding: generated PNG images decoded via `UniversalQrScannerEngine`.
+  - Quality Gates: Achieved **98.37% line coverage** (1571/1597 lines hit), 67/67 tests passing in generator engine, 94/94 in scanner engine, 0 static analysis errors/warnings/infos, and 100% compile-time binary isolation verified. Automated gate script `scripts/verify_subphase_3_2_2.ps1`.
+- **[2026-11-22T11:52:30+05:30] [PAUSE] Awaiting User Confirmation to Begin Stage 4 / Subphase 4.1.1**: Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts.

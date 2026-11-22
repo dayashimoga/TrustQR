@@ -56,6 +56,12 @@ class QrLogoConfig {
   /// Whether to clear underlying QR modules in the matrix to prevent visual clashes.
   final bool clearUnderlyingModules;
 
+  /// Optional SVG path data for vector rendering (e.g. "M10 10 H 90 V 90 H 10 Z").
+  final String? svgPathData;
+
+  /// Optional fill color (ARGB) for SVG path when rendered.
+  final int? svgFillHex;
+
   const QrLogoConfig({
     this.rawBytes,
     this.sizeRatio = 0.20,
@@ -63,6 +69,8 @@ class QrLogoConfig {
     this.borderRadius = 6,
     this.backgroundColorHex = 0xFFFFFFFF,
     this.clearUnderlyingModules = true,
+    this.svgPathData,
+    this.svgFillHex,
   });
 
   /// Computes the total cutout width/height in modules (including inner quiet zone).
@@ -151,6 +159,10 @@ class QrLogoConfig {
         ? '0x${backgroundColorHex!.toRadixString(16).padLeft(8, '0')}'
         : null,
     'clearUnderlyingModules': clearUnderlyingModules,
+    'svgPathData': svgPathData,
+    'svgFillHex': svgFillHex != null
+        ? '0x${svgFillHex!.toRadixString(16).padLeft(8, '0')}'
+        : null,
   };
 
   factory QrLogoConfig.fromJson(Map<String, dynamic> json) {
@@ -166,6 +178,8 @@ class QrLogoConfig {
       borderRadius: json['borderRadius'] as int? ?? 6,
       backgroundColorHex: parseHex(json['backgroundColorHex']),
       clearUnderlyingModules: json['clearUnderlyingModules'] as bool? ?? true,
+      svgPathData: json['svgPathData'] as String?,
+      svgFillHex: parseHex(json['svgFillHex']),
     );
   }
 }

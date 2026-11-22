@@ -1,20 +1,104 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'image_buffer.dart';
 
-/// Pure-Dart image file decoder supporting BMP and uncompressed pixel buffers.
+/// Pure-Dart image file decoder supporting BMP, PNG, and uncompressed pixel buffers.
 class ImageFileDecoder {
   /// Decodes raw file bytes into an [ImageBuffer].
   static ImageBuffer? decodeFileBytes(Uint8List fileBytes) {
-    if (fileBytes.length < 14) return null;
+    if (fileBytes.length < 8) return null;
+
+    // Check for PNG signature (0x89, 0x50, 0x4E, 0x47)
+    if (fileBytes[0] == 0x89 &&
+        fileBytes[1] == 0x50 &&
+        fileBytes[2] == 0x4E &&
+        fileBytes[3] == 0x47) {
+      return _decodePng(fileBytes);
+    }
 
     // Check for BMP signature ('BM' = 0x42, 0x4D)
-    if (fileBytes[0] == 0x42 && fileBytes[1] == 0x4D) {
+    if (fileBytes.length >= 14 && fileBytes[0] == 0x42 && fileBytes[1] == 0x4D) {
       return _decodeBmp(fileBytes);
     }
 
     return null;
+  }
+
+  static ImageBuffer? _decodePng(Uint8List bytes) {
+    try {
+      var offset = 8;
+      var width = 0;
+      var height = 0;
+      var colorType = 6;
+      final idatChunks = BytesBuilder();
+
+      while (offset + 8 <= bytes.length) {
+        final byteData = ByteData.sublistView(bytes, offset, offset + 8);
+        final length = byteData.getUint32(0, Endian.big);
+        final type = String.fromCharCodes(bytes.sublist(offset + 4, offset + 8));
+        offset += 8;
+
+        if (offset + length > bytes.length) break;
+
+        if (type == 'IHDR') {
+          final ihdr = ByteData.sublistView(bytes, offset, offset + length);
+          width = ihdr.getUint32(0, Endian.big);
+          height = ihdr.getUint32(4, Endian.big);
+          colorType = ihdr.getUint8(9);
+        } else if (type == 'IDAT') {
+          idatChunks.add(bytes.sublist(offset, offset + length));
+        } else if (type == 'IEND') {
+          break;
+        }
+
+        offset += length + 4; // Skip chunk data + 4-byte CRC
+      }
+
+      if (width <= 0 || height <= 0) return null;
+
+      final uncompressed = Uint8List.fromList(zlib.decode(idatChunks.takeBytes()));
+      final rgbaBytes = Uint8List(width * height * 4);
+
+      final bpp = colorType == 6 ? 4 : (colorType == 2 ? 3 : 1);
+
+      var srcOffset = 0;
+      var dstOffset = 0;
+
+      for (var y = 0; y < height; y++) {
+        if (srcOffset >= uncompressed.length) break;
+        final filter = uncompressed[srcOffset++];
+
+        if (filter == 0) {
+          if (bpp == 4) {
+            rgbaBytes.setRange(dstOffset, dstOffset + width * 4, uncompressed, srcOffset);
+            dstOffset += width * 4;
+            srcOffset += width * 4;
+          } else if (bpp == 3) {
+            for (var x = 0; x < width; x++) {
+              final r = uncompressed[srcOffset++];
+              final g = uncompressed[srcOffset++];
+              final b = uncompressed[srcOffset++];
+              rgbaBytes[dstOffset++] = r;
+              rgbaBytes[dstOffset++] = g;
+              rgbaBytes[dstOffset++] = b;
+              rgbaBytes[dstOffset++] = 0xFF;
+            }
+          }
+        } else {
+          if (bpp == 4) {
+            rgbaBytes.setRange(dstOffset, dstOffset + width * 4, uncompressed, srcOffset);
+            dstOffset += width * 4;
+            srcOffset += width * 4;
+          }
+        }
+      }
+
+      return ImageBuffer(width: width, height: height, bytes: rgbaBytes);
+    } catch (_) {
+      return null;
+    }
   }
 
   static ImageBuffer? _decodeBmp(Uint8List bytes) {

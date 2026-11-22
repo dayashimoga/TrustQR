@@ -13,6 +13,12 @@ export 'src/style/qr_logo_config.dart';
 export 'src/style/qr_template.dart';
 export 'src/rasterizer/qr_generated_image.dart';
 export 'src/rasterizer/qr_matrix_rasterizer.dart';
+export 'src/simulator/scannability_simulator.dart';
+export 'src/export/crc32.dart';
+export 'src/export/png_exporter.dart';
+export 'src/export/svg_exporter.dart';
+export 'src/export/pdf_exporter.dart';
+export 'src/export/batch_exporter.dart';
 export 'src/engine/artistic_qr_generator_engine.dart';
 
 /// Supported artistic module shapes.
@@ -78,5 +84,10 @@ class DefaultQrGeneratorEngine extends ArtisticQrGeneratorEngine {
   const DefaultQrGeneratorEngine({
     super.encoder,
     super.rasterizer,
+    super.simulator,
+    super.pngExporter,
+    super.svgExporter,
+    super.pdfExporter,
+    super.batchExporter,
   });
 }

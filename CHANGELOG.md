@@ -4,6 +4,51 @@
 
 ---
 
+## [0.1.0-subphase.3.2.2] - 2026-11-22
+
+### Added
+- **Real-Time Scannability & Contrast Simulator (`packages/qr_generator_engine`)**:
+  - **Comprehensive Diagnostics & Contrast Analysis** (`lib/src/simulator/scannability_simulator.dart`):
+    - Exact Michelson contrast ratio calculation $(L_{max} - L_{min}) / (L_{max} + L_{min})$ alongside WCAG 2.1 contrast ratio.
+    - Environmental lighting and stress condition simulation: standard studio, high surface glare wash-out (35% contrast reduction), low-light sensor noise floor, 30° perspective tilt, and distance optical blur.
+    - Diagnostic warning flags: `CRITICAL_LOW_CONTRAST`, `SUBOPTIMAL_CONTRAST`, `EXCESSIVE_LOGO_OCCLUSION`, `HIGH_LOGO_OCCLUSION`, and `INSUFFICIENT_QUIET_ZONE`.
+    - Actionable engineering recommendations guiding contrast, logo dimensions, and quiet zone adjustments.
+    - Full JSON serialization and deserialization for `ScannabilityReport` and `SimulatedEnvironmentScore`.
+- **Pure-Dart High-DPI PNG Exporter (`packages/qr_generator_engine`)**:
+  - **ISO/IEC 15948 Compliant PNG Writer** (`lib/src/export/png_exporter.dart`, `lib/src/export/crc32.dart`):
+    - Standards-compliant 8-byte signature, `IHDR` (32-bit RGBA color type 6), `pHYs` chunk with customizable DPI conversion (e.g. 300 DPI = 11,811 pixels/meter), and `IDAT` scanline chunk with filter type 0 and zlib deflation.
+    - Pure-Dart standard CRC-32 (IEEE 802.3 / ISO 3309) calculation engine with precomputed 256-word lookup table.
+    - End-to-end round-trip scannability verified via `ImageFileDecoder` and `UniversalQrScannerEngine`.
+- **Resolution-Independent Vector SVG Exporter (`packages/qr_generator_engine`)**:
+  - **Scalable Vector Graphics Writer** (`lib/src/export/svg_exporter.dart`):
+    - Produces clean XML `<svg>` with `<defs>` supporting multi-stop linear and radial gradients.
+    - Vector primitives for all 6 module shapes: `square` (rect), `rounded` (rect with rx/ry fillets), `dots` (circle), `diamond` (polygon), `liquid` (connected rects), and `cyberGrid` (faceted octagon polygon).
+    - Vector finder patterns with custom outer frames (`square`, `rounded`, `circle`, `squircle`, `hexagonal`) and pupils (`square`, `rounded`, `circle`, `diamond`).
+    - Embedded logo cutout rendering with optional background box and vector `<path>` integration.
+- **Print-Ready Vector PDF Document Exporter (`packages/qr_generator_engine`)**:
+  - **ISO 32000-1 (%PDF-1.4) Vector Generator** (`lib/src/export/pdf_exporter.dart`):
+    - Zero-dependency pure-Dart vector PDF generator supporting standard Helvetica and Helvetica-Bold typefaces.
+    - 3 print-ready layouts:
+      - `singleLabel`: 4x4 inch (288x288 pt) centered QR label with title and URL subtitle.
+      - `stickerSheet`: Letter (612x792 pt) 3x4 grid with 12 border-delimited stickers and titles.
+      - `badgeCard`: CR80 credit-card / attendee badge (3.375 x 2.125 inches = 243x153 pt) with top event header bar and attendee credentials.
+    - Complete cross-reference table (`xref`), trailer dictionary, and `%%EOF` structuring.
+- **High-Performance Batch Exporter & PKZIP 2.0 Container (`packages/qr_generator_engine`)**:
+  - **Multi-Format Batch Processor & Archiver** (`lib/src/export/batch_exporter.dart`):
+    - Asynchronous batch dispatch across PNG, SVG, PDF, and BMP formats with progress callbacks and item-level error isolation.
+    - Automatic `manifest.json` generation within the bundle documenting timestamps, formats, item requests, and status counts.
+    - Pure-Dart PKZIP 2.0 writer (`toZipArchive`) producing standard ZIP archives with Local File Headers, Central Directory Headers, and End of Central Directory records.
+    - CSV parser (`exportFromCsv`) supporting headers (`id,content,title,templateId`) or single-column URLs.
+    - JSON parser (`exportFromJson`) supporting list or object formats.
+- **Scanner Engine PNG Decoding Support (`packages/qr_scanner_engine`)**:
+  - Extended `ImageFileDecoder.decodeFileBytes` to recognize PNG signature `0x89 0x50 0x4E 0x47`, parse `IHDR` and `IDAT` chunks, decompress scanlines via `zlib.decode`, and return standard `ImageBuffer`.
+- **Quality Gates & Automated Verification**:
+  - Authored comprehensive test suite in `packages/qr_generator_engine/test/export_and_simulator_test.dart` (30 new tests).
+  - Achieved **98.37% line coverage** (1,571 / 1,597 lines hit) across `packages/qr_generator_engine`.
+  - Created automated gate script `scripts/verify_subphase_3_2_2.ps1` verifying 0 static analysis errors/warnings/infos, 67/67 tests passing in generator, 94/94 in scanner, and 100% binary isolation.
+
+---
+
 ## [0.1.0-subphase.3.2.1] - 2026-11-22
 
 ### Added

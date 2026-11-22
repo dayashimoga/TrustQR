@@ -5,12 +5,27 @@ import '../../qr_generator_engine.dart';
 class ArtisticQrGeneratorEngine implements QrGeneratorEngine {
   final QrEncoder _encoder;
   final QrMatrixRasterizer _rasterizer;
+  final ScannabilitySimulator _simulator;
+  final PngExporter _pngExporter;
+  final SvgExporter _svgExporter;
+  final PdfExporter _pdfExporter;
+  final BatchExporter _batchExporter;
 
   const ArtisticQrGeneratorEngine({
     QrEncoder encoder = const QrEncoder(),
     QrMatrixRasterizer rasterizer = const QrMatrixRasterizer(),
+    ScannabilitySimulator simulator = const ScannabilitySimulator(),
+    PngExporter pngExporter = const PngExporter(),
+    SvgExporter svgExporter = const SvgExporter(),
+    PdfExporter pdfExporter = const PdfExporter(),
+    BatchExporter batchExporter = const BatchExporter(),
   })  : _encoder = encoder,
-        _rasterizer = rasterizer;
+        _rasterizer = rasterizer,
+        _simulator = simulator,
+        _pngExporter = pngExporter,
+        _svgExporter = svgExporter,
+        _pdfExporter = pdfExporter,
+        _batchExporter = batchExporter;
 
   /// Encodes [payload] into a standards-compliant [QrMatrix].
   QrMatrix generateMatrix(
@@ -101,6 +116,191 @@ class ArtisticQrGeneratorEngine implements QrGeneratorEngine {
       fixedMaskPattern: fixedMaskPattern,
     );
     return img.toBmp();
+  }
+
+  /// Simulates scannability under real-world environmental stress conditions.
+  ScannabilityReport simulateScannability(
+    String payload, {
+    QrTemplate? template,
+    QrModuleShape? moduleShape,
+    QrColorConfig? colorConfig,
+    QrEyeStyle? eyeStyle,
+    QrLogoConfig? logoConfig,
+    QrErrorCorrectionLevel errorCorrection = QrErrorCorrectionLevel.medium,
+    int quietZone = 4,
+    double roundTripConfidence = 1.0,
+  }) {
+    final shape = moduleShape ?? template?.moduleShape ?? QrModuleShape.square;
+    final colors = colorConfig ?? template?.colorConfig ?? const QrColorConfig();
+    final eyes = eyeStyle ?? template?.eyeStyle ?? const QrEyeStyle();
+    final logo = logoConfig ?? template?.logoConfig;
+
+    final matrix = generateMatrix(
+      payload,
+      errorCorrection: errorCorrection,
+      logoConfig: logo,
+    );
+
+    return _simulator.simulate(
+      matrix: matrix,
+      colorConfig: colors,
+      eyeStyle: eyes,
+      moduleShape: shape,
+      logoConfig: logo,
+      errorCorrection: errorCorrection,
+      quietZone: quietZone,
+      roundTripConfidence: roundTripConfidence,
+    );
+  }
+
+  /// Exports [payload] as a high-DPI PNG binary.
+  Uint8List exportPng(
+    String payload, {
+    QrTemplate? template,
+    QrModuleShape? moduleShape,
+    QrColorConfig? colorConfig,
+    QrEyeStyle? eyeStyle,
+    QrLogoConfig? logoConfig,
+    QrErrorCorrectionLevel errorCorrection = QrErrorCorrectionLevel.medium,
+    int moduleSize = 10,
+    int quietZone = 4,
+    int dpi = 300,
+    int? fixedVersion,
+    int? fixedMaskPattern,
+  }) {
+    final img = generateStyledImage(
+      payload,
+      template: template,
+      moduleShape: moduleShape,
+      colorConfig: colorConfig,
+      eyeStyle: eyeStyle,
+      logoConfig: logoConfig,
+      errorCorrection: errorCorrection,
+      moduleSize: moduleSize,
+      quietZone: quietZone,
+      fixedVersion: fixedVersion,
+      fixedMaskPattern: fixedMaskPattern,
+    );
+    return _pngExporter.export(img, dpi: dpi);
+  }
+
+  /// Exports [payload] as a resolution-independent vector SVG XML string.
+  String exportSvg(
+    String payload, {
+    QrTemplate? template,
+    QrModuleShape? moduleShape,
+    QrColorConfig? colorConfig,
+    QrEyeStyle? eyeStyle,
+    QrLogoConfig? logoConfig,
+    QrErrorCorrectionLevel errorCorrection = QrErrorCorrectionLevel.medium,
+    int moduleSize = 10,
+    int quietZone = 4,
+    double? displayWidth,
+    double? displayHeight,
+  }) {
+    final shape = moduleShape ?? template?.moduleShape ?? QrModuleShape.square;
+    final colors = colorConfig ?? template?.colorConfig ?? const QrColorConfig();
+    final eyes = eyeStyle ?? template?.eyeStyle ?? const QrEyeStyle();
+    final logo = logoConfig ?? template?.logoConfig;
+
+    final matrix = generateMatrix(
+      payload,
+      errorCorrection: errorCorrection,
+      logoConfig: logo,
+    );
+
+    return _svgExporter.export(
+      matrix: matrix,
+      moduleShape: shape,
+      colorConfig: colors,
+      eyeStyle: eyes,
+      logoConfig: logo,
+      moduleSize: moduleSize,
+      quietZone: quietZone,
+      displayWidth: displayWidth,
+      displayHeight: displayHeight,
+    );
+  }
+
+  /// Exports [payload] as a print-ready vector PDF binary.
+  Uint8List exportPdf(
+    String payload, {
+    QrTemplate? template,
+    QrColorConfig? colorConfig,
+    QrErrorCorrectionLevel errorCorrection = QrErrorCorrectionLevel.medium,
+    PdfPageLayout layout = PdfPageLayout.singleLabel,
+    String? title,
+    String? subtitle,
+    int quietZone = 4,
+  }) {
+    final colors = colorConfig ?? template?.colorConfig ?? const QrColorConfig();
+
+    final matrix = generateMatrix(
+      payload,
+      errorCorrection: errorCorrection,
+    );
+
+    return _pdfExporter.export(
+      matrix: matrix,
+      layout: layout,
+      title: title,
+      subtitle: subtitle,
+      colorConfig: colors,
+      quietZone: quietZone,
+    );
+  }
+
+  /// Executes batch export across multiple items with progress notification.
+  Future<QrBatchExportBundle> exportBatch({
+    required List<BatchItemRequest> requests,
+    ExportFormat format = ExportFormat.png,
+    QrTemplate? defaultTemplate,
+    QrErrorCorrectionLevel errorCorrection = QrErrorCorrectionLevel.medium,
+    int moduleSize = 10,
+    int quietZone = 4,
+    int dpi = 300,
+    void Function(int current, int total)? onProgress,
+  }) {
+    return _batchExporter.exportBatch(
+      requests: requests,
+      format: format,
+      defaultTemplate: defaultTemplate,
+      errorCorrection: errorCorrection,
+      moduleSize: moduleSize,
+      quietZone: quietZone,
+      dpi: dpi,
+      onProgress: onProgress,
+    );
+  }
+
+  /// Runs batch export parsed from CSV content.
+  Future<QrBatchExportBundle> exportFromCsv(
+    String csvContent, {
+    ExportFormat format = ExportFormat.png,
+    QrTemplate? defaultTemplate,
+    void Function(int current, int total)? onProgress,
+  }) {
+    return _batchExporter.exportFromCsv(
+      csvContent,
+      format: format,
+      defaultTemplate: defaultTemplate,
+      onProgress: onProgress,
+    );
+  }
+
+  /// Runs batch export parsed from JSON content.
+  Future<QrBatchExportBundle> exportFromJson(
+    String jsonContent, {
+    ExportFormat format = ExportFormat.png,
+    QrTemplate? defaultTemplate,
+    void Function(int current, int total)? onProgress,
+  }) {
+    return _batchExporter.exportFromJson(
+      jsonContent,
+      format: format,
+      defaultTemplate: defaultTemplate,
+      onProgress: onProgress,
+    );
   }
 
   @override

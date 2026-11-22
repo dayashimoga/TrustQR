@@ -197,6 +197,14 @@ class QrColorConfig {
     return (lighter + 0.05) / (darker + 0.05);
   }
 
+  /// Converts ARGB int to CSS hex color (#RRGGBB).
+  static String toCssHex(int argb) {
+    final r = ((argb >> 16) & 0xFF).toRadixString(16).padLeft(2, '0');
+    final g = ((argb >> 8) & 0xFF).toRadixString(16).padLeft(2, '0');
+    final b = (argb & 0xFF).toRadixString(16).padLeft(2, '0');
+    return '#$r$g$b'.toUpperCase();
+  }
+
   Map<String, dynamic> toJson() => {
     'foregroundColorHex': '0x${foregroundColorHex.toRadixString(16).padLeft(8, '0')}',
     'backgroundColorHex': '0x${backgroundColorHex.toRadixString(16).padLeft(8, '0')}',
