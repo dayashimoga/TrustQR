@@ -22,7 +22,7 @@
 - [x] **Subphase 4.1.2**: WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests
 - [x] **Subphase 4.2.1**: Restricted User App (`apps/user_app`): Live/File/Batch Scanner & Threat HUD
 - [x] **Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate
-- [ ] **Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports
+- [x] **Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports
 - [ ] **Subphase 5.1.2**: Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage)
 - [ ] **Subphase 5.2.1**: Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer
 - [ ] **Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace
@@ -163,3 +163,21 @@
   - Confirmed 100% compile-time binary isolation (zero dependency on generator or admin analytics).
   - Quality Gates: Achieved **97.58% line coverage** (1696 / 1738 lines hit), 89/89 tests passing (100%), 0 static analyzer issues across monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% binary isolation verified. Automated gate script `scripts/verify_subphase_4_2_2.ps1`.
 - **[2026-11-22T12:13:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Stage 5 / Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports.
+- **[2026-11-22T12:15:00+05:30] [START] Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports.
+  - Implement time-series aggregators (hourly, daily, weekly, monthly volume buckets, moving averages, trend anomaly detection).
+  - Implement 15-format payload distribution breakdowns and percentage calculators.
+  - Implement Threat Firewall security detection metrics (attack category distributions, domain risk rankings, severity histograms).
+  - Implement signed `TrustQR` fleet registry: device/issuer tracking, token enrollment, status lifecycle, batch cryptographic revocation.
+  - Implement system audit log query engine with multi-criteria filtering and integrity checks.
+  - Implement CSV and JSON analytics report exporter with cryptographic hash stamps.
+  - Target: 100% passing tests with mandatory `>= 95.0%` line coverage and 0 static analyzer issues across all packages.
+- **[2026-11-22T12:37:00+05:30] [COMPLETED] Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports.
+  - Implemented `TimeSeriesBucketInterval` (`hourly`, `daily`, `weekly`, `monthly`), `TimeSeriesPoint`, and `TimeSeriesMetrics` with Simple Moving Average (SMA) smoothing and z-score anomaly detection ($|x_i - \mu|/\sigma \ge \text{threshold}$).
+  - Implemented `PayloadDistribution` and `PayloadDistributionCalculator` calculating accurate counts and percentage shares across all 15 supported payload formats with top format and non-URL format detection.
+  - Implemented `ThreatAnalyticsSummary` and `ThreatAnalyticsEngine` compiling risk score histograms (`0-19`, `20-39`, `40-59`, `60-79`, `80-100`), attack category mapping (phishing, IDN homographs, shorteners, SSRF, dangerous schemes, insecure Wi-Fi, DGA), and top malicious domains ranking.
+  - Implemented `FleetDevice`, `TrustQrTokenRecord`, and `FleetRegistry` managing hardware devices, telemetry heartbeats, device revocation/unrevocation, and single/batch cryptographic token revocations by issuer, role, or expiry.
+  - Implemented `AuditLogEntry`, `AuditLogFilter`, and `AuditLogEngine` providing tamper-evident administrative action logging signed via HMAC-SHA256, multi-criteria filtering, pagination, and cryptographic chronological integrity audits (`verifyAll()`).
+  - Implemented `AnalyticsReport` with automated cryptographic SHA-256 fingerprinting and `AnalyticsReportExporter` generating canonical JSON and 4 specialized CSV reports (time series, payload breakdown, threat firewall summary, fleet device/token inventory).
+  - Implemented `AdminAnalyticsFacade` unifying telemetry ingestion, reporting, and exports into a cohesive interface.
+  - Quality Gates: Achieved **99.02% line coverage** (913 / 922 lines hit), 26/26 tests passing (100%), 0 static analyzer issues across monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% binary isolation verified. Automated gate script `scripts/verify_subphase_5_1_1.ps1`.
+- **[2026-11-22T12:38:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 5.1.2**: Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage).

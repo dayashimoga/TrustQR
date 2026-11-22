@@ -1,55 +1,36 @@
-/// Admin-only analytics and fleet telemetry engine.
+/// Admin-only analytics, fleet telemetry, threat intelligence, and report exporter.
 library qr_admin_analytics;
 
-import 'package:qr_core/qr_core.dart';
+// Time series & anomaly detection
+export 'src/time_series/time_series_interval.dart';
+export 'src/time_series/time_series_point.dart';
+export 'src/time_series/time_series_metrics.dart';
+export 'src/time_series/time_series_aggregator.dart';
 
-/// Aggregated usage statistics for the admin dashboard.
-class FleetTelemetrySummary {
-  final int totalScans;
-  final int totalGenerations;
-  final int threatsDetected;
-  final Map<QrPayloadType, int> scansByPayloadType;
+// Payload distribution breakdown
+export 'src/breakdown/payload_distribution.dart';
+export 'src/breakdown/payload_distribution_calculator.dart';
 
-  const FleetTelemetrySummary({
-    required this.totalScans,
-    required this.totalGenerations,
-    required this.threatsDetected,
-    required this.scansByPayloadType,
-  });
+// Threat analytics & risk histograms
+export 'src/security/threat_analytics_summary.dart';
+export 'src/security/threat_analytics_engine.dart';
 
-  Map<String, dynamic> toJson() => {
-    'totalScans': totalScans,
-    'totalGenerations': totalGenerations,
-    'threatsDetected': threatsDetected,
-    'scansByPayloadType': scansByPayloadType.map((k, v) => MapEntry(k.name, v)),
-  };
-}
+// Fleet hardware & TrustQR token lifecycle registry
+export 'src/fleet/fleet_device.dart';
+export 'src/fleet/trust_qr_token_record.dart';
+export 'src/fleet/fleet_registry.dart';
 
-/// Service for calculating and exporting fleet metrics.
-class AdminAnalyticsService {
-  const AdminAnalyticsService();
+// Tamper-evident cryptographic audit log trail
+export 'src/audit/audit_log_entry.dart';
+export 'src/audit/audit_log_filter.dart';
+export 'src/audit/audit_log_engine.dart';
 
-  FleetTelemetrySummary aggregateMetrics({
-    required List<QrItem> items,
-    required int generationCount,
-  }) {
-    int totalScans = 0;
-    int threats = 0;
-    final payloadCounts = <QrPayloadType, int>{};
+// Consolidated reports & multi-format exporters
+export 'src/reports/analytics_report.dart';
+export 'src/reports/analytics_report_exporter.dart';
 
-    for (final item in items) {
-      totalScans++;
-      if (item.threatLevel != SecurityThreatLevel.safe) {
-        threats++;
-      }
-      payloadCounts[item.payloadType] = (payloadCounts[item.payloadType] ?? 0) + 1;
-    }
+// Unified facade
+export 'src/admin_analytics_facade.dart';
 
-    return FleetTelemetrySummary(
-      totalScans: totalScans,
-      totalGenerations: generationCount,
-      threatsDetected: threats,
-      scansByPayloadType: payloadCounts,
-    );
-  }
-}
+// Service helper
+export 'src/admin_analytics_service.dart';

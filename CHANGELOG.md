@@ -4,6 +4,54 @@
 
 ---
 
+## [0.1.0-subphase.5.1.1] - 2026-11-22
+
+### Added
+- **Admin Analytics Engine: Fleet Telemetry, Usage Insights, Threat Intelligence & Reports (`packages/qr_admin_analytics`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Strictly verified `apps/user_app` maintains zero compile-time or runtime dependencies on `qr_admin_analytics`.
+    - Automated negative breach test suite verified with 100% pass rate (`scripts/verify_binary_isolation.dart`).
+  - **Time-Series Aggregation & Anomaly Detection (`lib/src/time_series/*`)**:
+    - `TimeSeriesBucketInterval`: Support for continuous zero-padded buckets across `hourly`, `daily`, `weekly`, and `monthly` intervals with UTC boundary truncation, stepwise incrementation, and human-readable labeling.
+    - `TimeSeriesPoint`: Encapsulates `scanCount`, `generationCount`, `threatCount`, total volume, threat rate percentage, moving average, and anomaly flag.
+    - `TimeSeriesMetrics`: Aggregated summary statistics including average volume per bucket, sample standard deviation $\sigma$, peak volume with timestamp, and anomalous buckets list.
+    - `TimeSeriesAggregator`: Ingests vault items and generation timestamps, constructs continuous gap-padded timeline buckets, computes Simple Moving Average (SMA), and flags anomalous activity via z-score statistical thresholding ($|x_i - \mu|/\sigma \ge \text{threshold}$).
+  - **15-Format Payload Distribution Breakdown (`lib/src/breakdown/*`)**:
+    - `PayloadDistribution`: Aggregated count and percentage breakdown for all 15 supported QR payload formats (`url`, `wifi`, `vcard`, `mecard`, `geo`, `event`, `email`, `sms`, `tel`, `otpauth`, `upi`, `epc`, `crypto`, `gs1`, `plainText`). Detects top format and top non-URL format.
+    - `PayloadDistributionCalculator`: Computes distribution from vault item collections or incrementally recorded telemetry events.
+  - **Threat Intelligence & Risk Histograms (`lib/src/security/*`)**:
+    - `ThreatAnalyticsSummary`: Consolidated security overview capturing safe, caution, suspicious, and critical scan volumes, overall threat detection rate, and average safety score.
+    - Risk score histogram compiling counts across 5 discrete risk buckets (`0-19`, `20-39`, `40-59`, `60-79`, `80-100`).
+    - Attack category mapping: Classifies threats into Phishing / Social Engineering, URL Shortener Cloaking, IDN Homograph / Spoofing, SSRF / Local Network Probe, Dangerous URI Scheme, Insecure Wi-Fi Network, Algorithmic DGA Domain, and custom threat flags.
+    - Top malicious domains ranking sorted descending by detection frequency.
+    - `ThreatAnalyticsEngine`: Analyzes vault item lists or live inspection streams.
+  - **Fleet Hardware & TrustQR Token Lifecycle Registry (`lib/src/fleet/*`)**:
+    - `FleetDevice`: Hardware device record with OS, app version, registration timestamp, last active timestamp, activity counters, and revocation status.
+    - `TrustQrTokenRecord`: Cryptographic token record tracking subject, `UserRole` (admin/user), issuer authority, issue/expiration timestamps, validity, and revocation status.
+    - `FleetRegistry`: In-memory registry supporting device registration, telemetry heartbeat tracking, single/batch device revocation, unrevocation, token enrollment, and multi-criteria batch token revocations by issuer, role, or expiry.
+    - `FleetSummary`: Real-time fleet metrics consolidating active/revoked device counts, active/revoked/expired token counts, and OS breakdown.
+  - **Tamper-Evident Cryptographic Audit Trail (`lib/src/audit/*`)**:
+    - `AuditLogEntry`: Verifiable administrative audit entry (`id`, `timestamp`, `action`, `actorId`, `actorRole`, `targetId`, `details`, `ipAddress`, `integrityHash`).
+    - Deterministic canonical bytes serialization and HMAC-SHA256 signing and verification using `CryptoPrivateKey` and `CryptoPublicKey`.
+    - `AuditLogFilter`: Multi-criteria query filter supporting action, actor role, actor ID, target ID, date ranges, and keyword search with `copyWith`.
+    - `AuditLogEngine`: Signs and logs administrative actions, supports paginated queries, and provides comprehensive cryptographic and chronological integrity verification (`verifyAll()`).
+  - **Consolidated Reporting & Multi-Format Exporters (`lib/src/reports/*`)**:
+    - `AnalyticsReport`: Consolidates time-series metrics, payload distribution, threat summary, fleet summary, and audit log count with an automated cryptographic SHA-256 fingerprint.
+    - `AnalyticsReportExporter`: Pure-Dart exporter generating:
+      1. Deterministic JSON (raw or formatted).
+      2. Time-series bucket CSV with moving averages and anomaly flags.
+      3. 15-format payload distribution breakdown CSV.
+      4. Comprehensive threat firewall audit summary CSV with category breakdown, risk histogram, and top malicious domains.
+      5. Fleet registered hardware devices and TrustQR tokens inventory CSV with RFC 4180 escaping.
+      6. Canonical SHA-256 fingerprint generator for arbitrary exported reports.
+  - **Unified Administrative Facade (`lib/src/admin_analytics_facade.dart`)**:
+    - `AdminAnalyticsFacade`: Coordinates telemetry ingestion, threat analysis, fleet hardware/token tracking, cryptographic audit logs, and report exports into a cohesive interface.
+  - **Automated Verification Harness (`scripts/verify_subphase_5_1_1.ps1`)**:
+    - 4-step automated gate executing binary isolation audit, monorepo static analysis, full automated test suite, and line coverage check.
+    - Quality Gates: **99.02% line coverage** (913 / 922 lines hit), 26/26 tests passing (100%), 0 static analyzer issues (`flutter analyze --fatal-infos --fatal-warnings .`).
+
+---
+
 ## [0.1.0-subphase.4.2.2] - 2026-11-22
 
 ### Added
