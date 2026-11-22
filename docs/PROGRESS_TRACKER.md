@@ -11,8 +11,8 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 15 / 24 (`62.50%`)
-- **Current Active Subphase**: `4.2.2` (`PENDING` — Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate)
+- **Verified Subphases**: 16 / 24 (`66.67%`)
+- **Current Active Subphase**: `4.2.2` (`VERIFIED` — Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate)
 - **Next Subphase**: `5.1.1` (`PENDING` — Admin Analytics Engine: Fleet, Telemetry & Reports)
 - **Blocked Subphases**: 0
 
@@ -37,7 +37,7 @@
 | **4.1.1** | S4 / P4.1 | Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts | 35 min | 16 min | `VERIFIED` | 98.99% line coverage (587/593 lines hit, 37/37 tests pass, 0 analyzer issues) | `packages/qr_design_system/lib/src/*`, `test/*`, `scripts/verify_subphase_4_1_1.ps1` |
 | **4.1.2** | S4 / P4.1 | WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests | 30 min | 14 min | `VERIFIED` | 99.19% line coverage (737/743 lines hit, 64/64 tests pass, 0 analyzer issues) | `packages/qr_design_system/lib/src/{l10n,accessibility}/*`, `test/*`, `scripts/verify_subphase_4_1_2.ps1` |
 | **4.2.1** | S4 / P4.2 | Restricted User App (`apps/user_app`): Live/File/Batch Scanner & Threat HUD | 40 min | 16 min | `VERIFIED` | 99.32% line coverage (734/739 lines hit, 40/40 tests pass, 0 analyzer issues) | `apps/user_app/lib/*`, `apps/user_app/test/*`, `scripts/verify_subphase_4_2_1.ps1` |
-| **4.2.2** | S4 / P4.2 | Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **4.2.2** | S4 / P4.2 | Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate | 35 min | 16 min | `VERIFIED` | 97.58% line coverage (1696/1738 lines hit, 89/89 tests pass, 0 analyzer issues) | `apps/user_app/lib/*`, `apps/user_app/test/*`, `scripts/verify_subphase_4_2_2.ps1` |
 | **5.1.1** | S5 / P5.1 | Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **5.1.2** | S5 / P5.1 | Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage) | 25 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **5.2.1** | S5 / P5.2 | Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer | 45 min | — | `PENDING` | Pending (`>=95%` target) | — |

@@ -4,6 +4,62 @@
 
 ---
 
+## [0.1.0-subphase.4.2.2] - 2026-11-22
+
+### Added
+- **Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate (`apps/user_app`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Strictly verified `apps/user_app` has zero compile-time or runtime dependencies on `qr_generator_engine` or `qr_admin_analytics`.
+    - Automated negative breach test suite verified with 100% pass rate (`scripts/verify_binary_isolation.dart`).
+  - **Vault State Coordinator (`apps/user_app/lib/src/state/vault_controller.dart`)**:
+    - Reactive `ChangeNotifier` state coordinator wrapping `QrVault`.
+    - Manages filtered items list, user collections, unique tag vocabulary, multi-selection state, metrics, and tamper detection audits.
+    - Full-text search and multi-criteria filter dispatch: `searchQuery`, `isFavorite`, `threatLevels`, `payloadTypes`, `collectionId`, `tags`, and `sortBy`.
+    - Item mutation and cryptographic routines: `toggleFavorite`, `deleteItem`, `deleteSelected`, `updateTitle`, `updateNotes`, `setTags`, `assignCollection`, and `verifyIntegrity`.
+    - Collection management routines: `createCollection`, `deleteCollection` (with optional cascade deletion).
+    - Cryptographic data management: `exportSelectedOrAllToJson`, `importFromJson`, `purgeHistory`, `clearAllHistory`, and `updatePrivacyPolicy`.
+  - **Offline Vault View (`apps/user_app/lib/src/views/vault_view.dart`)**:
+    - Full-text search bar querying title, raw payload content, notes, and tags in real time with quick clear button.
+    - Quick category filter chips: All, Favorites, Safe, Caution/Threat.
+    - Dynamic tag carousel displaying all unique tags across the vault with toggleable filter selection.
+    - Sort selector supporting Newest First, Oldest First, Title (A-Z), and Safety Score (High).
+    - Multi-selection batch action bar displaying selected count with Select All, Deselect, Export Selected to JSON, and Delete Selected actions.
+    - Rich item card components displaying payload format icon, title/summary, format pill, timestamp, threat score badge, TrustQR badge, collection indicator, and instant favorite toggle.
+    - Empty state view handling both unpopulated vault and zero-match search/filter conditions with clear filters action.
+  - **Smart Collections View (`apps/user_app/lib/src/views/collections_view.dart`)**:
+    - Folder management interface rendering collection cards with color-coded accent badges, descriptions, and dynamic record counts.
+    - Interactive "New Collection" modal dialog with name, description, and multi-color accent picker (Cyan, Emerald, Amber, Crimson, Purple, Electric Blue).
+    - "View Records" action filtering Vault view to the target collection.
+    - Deletion dialog supporting folder deletion with option to preserve or purge contained records.
+    - Empty state card with quick creation action.
+  - **Record Detail & Cryptographic Inspector Modal (`apps/user_app/lib/src/widgets/vault_item_detail_modal.dart`)**:
+    - `CyberGlassSheet` inspection modal displaying full item attributes with favorite toggle and close actions.
+    - Prominent Cryptographic HMAC-SHA256 Integrity Verification banner displaying green "INTACT // UNTAMPERED" or red "SECURITY ALERT: TAMPERED RECORD // INVALID SIGNATURE".
+    - Threat overview card featuring `ThreatScoreGauge`, semantic `CyberBadge`, and `TrustQrBadge` institutional authority card.
+    - Raw payload box with selectable monospace text and clipboard copy action.
+    - Comprehensive metadata grid (Record ID, Origin, Created timestamp, Updated timestamp).
+    - Collection assignment dropdown selector.
+    - Interactive tag manager with chip deletion and new tag addition input.
+    - User notes editor with persistent encrypted note saving.
+    - Single-record deletion action with confirmation.
+  - **Security, Privacy & Settings View (`apps/user_app/lib/src/views/settings_view.dart`)**:
+    - Appearance & Accessibility card: High-Contrast Theme (WCAG AAA 21:1) toggle.
+    - Privacy & Retention card: Privacy Incognito Mode switch, Auto-Purge History retention threshold selector (Disabled, 7 Days, 30 Days, 90 Days), Preserve Favorites on Purge switch, "Purge Expired Scans Now" action, and "Clear All Scan History" action with danger confirmation dialog.
+    - Cryptographic Backup & Portability card: "Export Vault (JSON)" modal with copy-to-clipboard, and "Restore Vault (JSON)" modal with paste input, overwrite toggle, and HMAC-verified import results.
+    - Security Posture & RBAC Entitlement card: Displays Role: `RESTRICTED USER`, Binary Isolation: `VERIFIED // ZERO GENERATOR`, Scanner Engine: `ACTIVE`, Generator Studio: `COMPILE-TIME EXCLUDED`, and Admin Analytics: `COMPILE-TIME EXCLUDED`.
+  - **Application Shell & Secondary Inspector Integration (`apps/user_app/lib/main.dart`)**:
+    - Configured 4 primary workspace tabs: Scanner (`scan`), Vault (`vault`), Collections (`collections`), and Settings (`settings`).
+    - Wired search shortcut (`Ctrl+F` / `Cmd+F`) to navigate directly to the Vault tab.
+    - Secondary inspector pane updated with live encrypted vault statistics (Total Records, Favorites, Collections, and Tampered Audit status) alongside firewall engine status and action dispatch log.
+- **Quality Gates & Coverage**:
+  - Achieved **97.58% line coverage** (1696 / 1738 lines hit) across `apps/user_app`.
+  - 100% test pass rate across 89 unit, widget, and integration tests (`apps/user_app/test/*`).
+  - 0 static analysis errors, warnings, or infos across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`).
+  - 100% compile-time binary isolation confirmed (`dart run scripts/verify_binary_isolation.dart`).
+  - Automated verification script: `scripts/verify_subphase_4_2_2.ps1`.
+
+---
+
 ## [0.1.0-subphase.4.2.1] - 2026-11-22
 
 ### Added

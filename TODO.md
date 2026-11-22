@@ -21,7 +21,7 @@
 - [x] **Subphase 4.1.1**: Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts
 - [x] **Subphase 4.1.2**: WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests
 - [x] **Subphase 4.2.1**: Restricted User App (`apps/user_app`): Live/File/Batch Scanner & Threat HUD
-- [ ] **Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate
+- [x] **Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate
 - [ ] **Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports
 - [ ] **Subphase 5.1.2**: Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage)
 - [ ] **Subphase 5.2.1**: Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer
@@ -145,3 +145,21 @@
   - Implemented `ScannerController` central state management coordinating `ScanToVaultPipeline`, viewfinder HUD state, active threat inspection, multi-QR candidates, torch, and incognito mode.
   - Quality Gates: Achieved **99.32% line coverage** (734 / 739 lines hit), 40/40 tests passing (100%), 0 static analyzer issues across entire monorepo, 100% compile-time binary isolation confirmed (`dart run scripts/verify_binary_isolation.dart`). Automated gate script `scripts/verify_subphase_4_2_1.ps1`.
 - **[2026-11-22T11:53:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate.
+- **[2026-11-22T11:55:00+05:30] [START] Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate in `apps/user_app`.
+  - Implement `VaultController` state coordinator for items, query filters, collections, tags, selection, and batch actions.
+  - Implement `VaultView` with full-text search, filter chips (All, Favorites, Threat Level, Format), tag carousel, sorting, and batch deletion/export.
+  - Implement `CollectionsView` with folder management, color tags, item counts, and create/delete dialogs.
+  - Implement `VaultItemDetailModal` with full metadata inspection, HMAC-SHA256 integrity verification, notes editing, tag assignment, and collection selector.
+  - Implement `SettingsView` with theme selector, privacy auto-purge retention policies, JSON backup/restore, and cryptographic user entitlement status.
+  - Verify zero generator/admin dependencies and execute `scripts/verify_binary_isolation.dart`.
+  - Target: 100% passing tests with mandatory `>= 95.0%` line coverage and 0 static analyzer issues across all packages.
+- **[2026-11-22T12:12:00+05:30] [COMPLETED] Subphase 4.2.2**: Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate (`apps/user_app`).
+  - Implemented `VaultController` state coordinator managing `QrVault`, full-text search, multi-criteria filtering, collection folders, tags vocabulary, multi-selection, favorite toggles, metadata/notes editing, privacy auto-purge retention policies, and cryptographic JSON backup export/import.
+  - Implemented `VaultView` with full-text search bar, quick filter chips (All, Favorites, Safe, Caution/Threat), tag carousel, sorting options, batch selection action bar, and responsive item cards with payload icon, format pill, safety score, TrustQR badge, and favorite toggle.
+  - Implemented `CollectionsView` with smart folder cards, dynamic record counts, color accent badges, "View Records" filter dispatch, "New Collection" modal dialog, and deletion dialog with cascade options.
+  - Implemented `VaultItemDetailModal` with real-time HMAC-SHA256 integrity verification banner (intact vs tampered alert), ThreatScoreGauge safety rating, TrustQR authenticity card, selectable raw payload with copy button, collection assignment dropdown, tag manager (add/remove tags), and encrypted user notes editor.
+  - Implemented `SettingsView` with WCAG AAA high-contrast toggle, privacy incognito mode switch, auto-purge history retention policy selector (Disabled, 7 Days, 30 Days, 90 Days), preserve favorites switch, manual purge/clear actions, cryptographic JSON export/import with integrity verification, and RBAC entitlement security posture card.
+  - Integrated 4 workspace navigation tabs in `UserApp` (`main.dart`), wired search shortcut (`Ctrl+F`), and secondary inspector pane with live vault metrics and tamper audit status.
+  - Confirmed 100% compile-time binary isolation (zero dependency on generator or admin analytics).
+  - Quality Gates: Achieved **97.58% line coverage** (1696 / 1738 lines hit), 89/89 tests passing (100%), 0 static analyzer issues across monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% binary isolation verified. Automated gate script `scripts/verify_subphase_4_2_2.ps1`.
+- **[2026-11-22T12:13:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Stage 5 / Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports.

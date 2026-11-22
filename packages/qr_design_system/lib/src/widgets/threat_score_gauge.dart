@@ -137,30 +137,33 @@ class _ThreatScoreGaugeState extends State<ThreatScoreGauge> with SingleTickerPr
                         strokeWidth: widget.strokeWidth,
                       ),
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          val.toStringAsFixed(0),
-                          style: CyberTypography.monospace(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w800,
-                            color: color,
-                          ),
-                        ),
-                        if (widget.showLabel) ...[
-                          const SizedBox(height: 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Text(
-                            currentRating,
+                            val.toStringAsFixed(0),
                             style: CyberTypography.monospace(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
                               color: color,
-                              letterSpacing: 1.0,
                             ),
                           ),
+                          if (widget.showLabel) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              currentRating,
+                              style: CyberTypography.monospace(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: color,
+                                letterSpacing: 1.0,
+                              ),
+                            ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ],
                 );
