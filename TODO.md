@@ -27,7 +27,7 @@
 - [x] **Subphase 5.2.1**: Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer
 - [x] **Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace
 - [x] **Subphase 6.1.1**: Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets)
-- [ ] **Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector)
+- [x] **Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector)
 - [ ] **Subphase 6.2.1**: Full-Ecosystem E2E Tests, `>=95%` Coverage Audit, RBAC Audit & Native Build Validation
 - [ ] **Subphase 6.2.2**: Complete Documentation Suite (`USER_GUIDE`, `SECURITY`, `INSTALL`) & Release Sign-Off
 
@@ -240,3 +240,24 @@
   - Implemented `scripts/verify_native_runner_configs.dart` auditing 47 automated rules across application IDs, display names, permissions, and entitlements.
   - Quality Gates: 47/47 native runner rules verified (100%), 10/10 standalone non-nested archives verified with valid SHA-256 manifests, 132/132 app tests passing across `apps/user_app` and `apps/admin_app`, 0 static analyzer issues across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% compile-time binary isolation confirmed. Automated gate script `scripts/verify_subphase_6_1_1.ps1`.
 - **[2026-11-22T13:55:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector).
+- **[2026-11-22T13:56:00+05:30] [START] Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector).
+  - Implement `.github/workflows/ci-quality-gate.yml` for pull requests and pushes to `main`:
+    - Strict compile-time binary isolation audit (`scripts/verify_binary_isolation.dart`).
+    - Monorepo static analysis (`flutter analyze --fatal-infos --fatal-warnings .`).
+    - Native runner configuration auditor (`scripts/verify_native_runner_configs.dart`).
+    - Automated test suites across all 5 packages, 1 backend service, and 2 apps with mandatory `>=95%` line coverage enforcement.
+    - Security penetration suite (`services/rbac_api`) and adversarial scanner corpus verification.
+  - Implement `.github/workflows/build-release-matrix.yml` with dual trigger support (push tags and `workflow_dispatch`):
+    - Selective inputs: `target_app` (`all|admin_app|user_app`), `target_platform` (`all|android|ios|windows|linux|macos`), `build_mode` (`release|debug|profile`), `publish_release` (`true|false`).
+    - Multi-runner OS matrix (`ubuntu-latest`, `windows-latest`, `macos-latest`) with conditional platform dispatch filters.
+    - Standalone non-nested packaging pipeline via `scripts/package_artifact.sh` / `scripts/package_artifact.ps1`.
+    - Upload of individual standalone downloadable artifacts with embedded `INSTALL.md`, `BUILD_METADATA.json`, and detached `.sha256` checksum manifests (zero nested ZIP-in-ZIP archives).
+    - Automated GitHub Release generation when `publish_release` is true.
+  - Implement automated workflow validation test suite (`scripts/verify_github_workflows.dart`).
+  - Target: 100% passing tests, 0 static analyzer issues, valid GitHub Actions YAML schemas.
+- **[2026-11-22T14:00:00+05:30] [COMPLETED] Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector).
+  - Implemented `.github/workflows/ci-quality-gate.yml` with 6 gates: Binary Isolation, Native Runners, Static Analysis, Threat & RBAC Penetration, Monorepo Test & Coverage (>=95% with lcov), and Standalone Packaging Pipeline.
+  - Implemented `.github/workflows/build-release-matrix.yml` with dual triggers (release tags and `workflow_dispatch`), 4 interactive inputs (`target_app`, `target_platform`, `build_mode`, `publish_release`), 3 OS runner targets (`windows-latest`, `ubuntu-latest`, `macos-latest`), preflight audit dependencies, standalone non-nested packaging uploads, and automated GitHub Releases.
+  - Implemented `scripts/verify_github_workflows.dart` with 26 automated schema validation rules.
+  - Quality Gates: 26/26 workflow rules verified (100%), 47/47 native runner rules verified (100%), 10/10 standalone non-nested archives verified with SHA-256 manifests, 132/132 app tests passing across `apps/user_app` and `apps/admin_app`, 0 static analyzer issues across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% compile-time binary isolation confirmed. Automated gate script `scripts/verify_subphase_6_1_2.ps1`.
+- **[2026-11-22T14:01:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 6.2.1**: Full-Ecosystem E2E Tests, `>=95%` Coverage Audit, RBAC Audit & Native Build Validation.

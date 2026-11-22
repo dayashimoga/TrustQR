@@ -1,0 +1,414 @@
+name: Cross-Platform Build & Standalone Release Matrix
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      target_app:
+        description: 'Target Application to Build'
+        required: true
+        type: choice
+        options:
+          - all
+          - admin_app
+          - user_app
+        default: all
+      target_platform:
+        description: 'Target Platform to Build'
+        required: true
+        type: choice
+        options:
+          - all
+          - android
+          - ios
+          - windows
+          - linux
+          - macos
+        default: all
+      build_mode:
+        description: 'Flutter Build Mode'
+        required: true
+        type: choice
+        options:
+          - release
+          - debug
+          - profile
+        default: release
+      publish_release:
+        description: 'Publish GitHub Release with Standalone Assets'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: build-release-matrix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================================
+  # PREFLIGHT: Binary Isolation & Architectural Governance Quality Gate
+  # ============================================================================
+  preflight-audit:
+    name: Pre-Build Governance & Binary Isolation Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Bootstrap Dependencies
+        run: |
+          for pkg in packages/qr_core packages/qr_scanner_engine packages/qr_generator_engine packages/qr_design_system packages/qr_admin_analytics services/rbac_api apps/user_app apps/admin_app; do
+            (cd "$pkg" && flutter pub get)
+          done
+
+      - name: Verify Binary Isolation Invariant
+        run: dart run scripts/verify_binary_isolation.dart
+
+      - name: Verify Native Runner Configurations
+        run: dart run scripts/verify_native_runner_configs.dart
+
+      - name: Static Analysis
+        run: flutter analyze --fatal-infos --fatal-warnings .
+
+  # ============================================================================
+  # WINDOWS BUILD MATRIX
+  # ============================================================================
+  build-windows:
+    name: Windows (${{ matrix.app }})
+    needs: [preflight-audit]
+    runs-on: windows-latest
+    timeout-minutes: 45
+    if: |
+      github.event_name == 'push' ||
+      inputs.target_platform == 'all' ||
+      inputs.target_platform == 'windows'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [user_app, admin_app]
+
+    steps:
+      - name: Filter Target Application
+        id: filter
+        shell: bash
+        run: |
+          TARGET="${{ inputs.target_app || 'all' }}"
+          if [ "$TARGET" != "all" ] && [ "$TARGET" != "${{ matrix.app }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout Repository
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter SDK
+        if: steps.filter.outputs.skip != 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Windows Desktop Support
+        if: steps.filter.outputs.skip != 'true'
+        run: flutter config --enable-windows-desktop
+
+      - name: Build Windows Application
+        if: steps.filter.outputs.skip != 'true'
+        shell: pwsh
+        run: |
+          $mode = "${{ inputs.build_mode }}"
+          if (-not $mode) { $mode = "release" }
+          Push-Location "apps/${{ matrix.app }}"
+          flutter build windows "--$mode"
+          Pop-Location
+
+      - name: Package Standalone Non-Nested Artifact
+        if: steps.filter.outputs.skip != 'true'
+        shell: pwsh
+        run: |
+          $mode = "${{ inputs.build_mode }}"
+          if (-not $mode) { $mode = "release" }
+          powershell -ExecutionPolicy Bypass -File scripts/package_artifact.ps1 -TargetApp "${{ matrix.app }}" -TargetPlatform windows -BuildMode "$mode" -OutputDir dist/artifacts
+
+      - name: Upload Standalone Windows Artifact
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrscanner-${{ matrix.app == 'user_app' && 'user' || 'admin' }}-windows-x64
+          path: dist/artifacts/qrscanner-*windows-x64.*
+          if-no-files-found: error
+
+  # ============================================================================
+  # LINUX BUILD MATRIX
+  # ============================================================================
+  build-linux:
+    name: Linux (${{ matrix.app }})
+    needs: [preflight-audit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: |
+      github.event_name == 'push' ||
+      inputs.target_platform == 'all' ||
+      inputs.target_platform == 'linux'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [user_app, admin_app]
+
+    steps:
+      - name: Filter Target Application
+        id: filter
+        run: |
+          TARGET="${{ inputs.target_app || 'all' }}"
+          if [ "$TARGET" != "all" ] && [ "$TARGET" != "${{ matrix.app }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout Repository
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Install Linux Build Dependencies
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+
+      - name: Setup Flutter SDK
+        if: steps.filter.outputs.skip != 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable Linux Desktop Support
+        if: steps.filter.outputs.skip != 'true'
+        run: flutter config --enable-linux-desktop
+
+      - name: Build Linux Application
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          (cd "apps/${{ matrix.app }}" && flutter build linux "--$MODE")
+
+      - name: Package Standalone Non-Nested Artifact
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          bash scripts/package_artifact.sh "${{ matrix.app }}" linux "$MODE" dist/artifacts
+
+      - name: Upload Standalone Linux Artifact
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrscanner-${{ matrix.app == 'user_app' && 'user' || 'admin' }}-linux-x64
+          path: dist/artifacts/qrscanner-*linux-x64.*
+          if-no-files-found: error
+
+  # ============================================================================
+  # ANDROID BUILD MATRIX
+  # ============================================================================
+  build-android:
+    name: Android (${{ matrix.app }})
+    needs: [preflight-audit]
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: |
+      github.event_name == 'push' ||
+      inputs.target_platform == 'all' ||
+      inputs.target_platform == 'android'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [user_app, admin_app]
+
+    steps:
+      - name: Filter Target Application
+        id: filter
+        run: |
+          TARGET="${{ inputs.target_app || 'all' }}"
+          if [ "$TARGET" != "all" ] && [ "$TARGET" != "${{ matrix.app }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout Repository
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Java Development Kit (JDK 17)
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter SDK
+        if: steps.filter.outputs.skip != 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Build Android APK
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          (cd "apps/${{ matrix.app }}" && flutter build apk "--$MODE")
+
+      - name: Package Standalone Non-Nested Artifact
+        if: steps.filter.outputs.skip != 'true'
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          bash scripts/package_artifact.sh "${{ matrix.app }}" android "$MODE" dist/artifacts
+
+      - name: Upload Standalone Android Artifact
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrscanner-${{ matrix.app == 'user_app' && 'user' || 'admin' }}-android-apk
+          path: dist/artifacts/qrscanner-*android-apk.*
+          if-no-files-found: error
+
+  # ============================================================================
+  # MACOS & IOS BUILD MATRIX
+  # ============================================================================
+  build-apple:
+    name: macOS & iOS (${{ matrix.app }})
+    needs: [preflight-audit]
+    runs-on: macos-latest
+    timeout-minutes: 50
+    if: |
+      github.event_name == 'push' ||
+      inputs.target_platform == 'all' ||
+      inputs.target_platform == 'macos' ||
+      inputs.target_platform == 'ios'
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [user_app, admin_app]
+
+    steps:
+      - name: Filter Target Application
+        id: filter
+        run: |
+          TARGET="${{ inputs.target_app || 'all' }}"
+          if [ "$TARGET" != "all" ] && [ "$TARGET" != "${{ matrix.app }}" ]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout Repository
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter SDK
+        if: steps.filter.outputs.skip != 'true'
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Enable macOS Desktop Support
+        if: steps.filter.outputs.skip != 'true'
+        run: flutter config --enable-macos-desktop
+
+      - name: Build macOS Application
+        if: |
+          steps.filter.outputs.skip != 'true' &&
+          (github.event_name == 'push' || inputs.target_platform == 'all' || inputs.target_platform == 'macos')
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          (cd "apps/${{ matrix.app }}" && flutter build macos "--$MODE")
+          bash scripts/package_artifact.sh "${{ matrix.app }}" macos "$MODE" dist/artifacts
+
+      - name: Build iOS Application
+        if: |
+          steps.filter.outputs.skip != 'true' &&
+          (github.event_name == 'push' || inputs.target_platform == 'all' || inputs.target_platform == 'ios')
+        run: |
+          MODE="${{ inputs.build_mode || 'release' }}"
+          (cd "apps/${{ matrix.app }}" && flutter build ios --no-codesign "--$MODE")
+          bash scripts/package_artifact.sh "${{ matrix.app }}" ios "$MODE" dist/artifacts
+
+      - name: Upload Standalone Apple Artifacts
+        if: steps.filter.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: qrscanner-${{ matrix.app == 'user_app' && 'user' || 'admin' }}-apple
+          path: |
+            dist/artifacts/qrscanner-*macos-universal.*
+            dist/artifacts/qrscanner-*ios-app.*
+          if-no-files-found: ignore
+
+  # ============================================================================
+  # RELEASE PUBLISHER: Standalone Asset Aggregator & GitHub Release
+  # ============================================================================
+  publish-release:
+    name: Publish GitHub Release (Standalone Non-Nested Assets)
+    needs: [preflight-audit, build-windows, build-linux, build-android, build-apple]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: |
+      always() &&
+      !contains(needs.*.result, 'failure') &&
+      !contains(needs.*.result, 'cancelled') &&
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || inputs.publish_release == true)
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/downloaded_artifacts
+
+      - name: Aggregate Standalone Assets & Generate Master Checksums
+        run: |
+          mkdir -p dist/release_distribution
+          echo "Aggregating standalone non-nested archives..."
+
+          # Find and copy all archive files and checksum manifests to a flat directory
+          find dist/downloaded_artifacts -type f \( -name "*.zip" -o -name "*.tar.gz" -o -name "*.sha256" \) -exec cp {} dist/release_distribution/ \;
+
+          echo "Generating master SHA-256 manifest..."
+          (
+            cd dist/release_distribution
+            sha256sum *.zip *.tar.gz > SHA256SUMS.txt 2>/dev/null || true
+          )
+
+          echo "Standalone release assets ready:"
+          ls -lh dist/release_distribution
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/release_distribution/*.zip
+            dist/release_distribution/*.tar.gz
+            dist/release_distribution/*.sha256
+            dist/release_distribution/SHA256SUMS.txt
+          generate_release_notes: true
+          draft: false
+          prerelease: false

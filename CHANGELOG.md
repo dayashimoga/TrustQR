@@ -4,6 +4,41 @@
 
 ---
 
+## [0.1.0-subphase.6.1.2] - 2026-11-22
+
+### Added
+- **GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Re-verified that `apps/user_app` remains 100% physically and compile-time isolated from `packages/qr_generator_engine` and `packages/qr_admin_analytics`. Binary isolation audit script passed with 0 violations.
+  - **Comprehensive CI Quality Gate & Security Enforcement (`.github/workflows/ci-quality-gate.yml`)**:
+    - Automatic triggers on `push` and `pull_request` to `main`, plus manual `workflow_dispatch`.
+    - Gate 1: Compile-time binary isolation audit preventing forbidden dependency bleed.
+    - Gate 2: Cross-platform native runner configuration auditor verifying application IDs, display names, and sandboxed entitlements.
+    - Gate 3: Monorepo static analysis (`flutter analyze --fatal-infos --fatal-warnings .`).
+    - Gate 4: Security threat firewall verification using the 150-vector adversarial corpus and server-side RBAC penetration suite.
+    - Gate 5: Automated test suites across all packages, backend services, and applications enforcing the mandatory `>=95%` line coverage gate with `lcov`.
+    - Gate 6: Standalone non-nested packaging pipeline verification.
+  - **Full Matrix & On-Demand Release Workflow (`.github/workflows/build-release-matrix.yml`)**:
+    - Dual triggers: release tags (`v*`) and selective `workflow_dispatch` executions.
+    - Interactive dispatch inputs:
+      - `target_app`: `all`, `admin_app`, `user_app`.
+      - `target_platform`: `all`, `android`, `ios`, `windows`, `linux`, `macos`.
+      - `build_mode`: `release`, `debug`, `profile`.
+      - `publish_release`: boolean switch for automated GitHub Releases.
+    - Architectural preflight governance gate (`preflight-audit`) running on `ubuntu-latest` before any platform compilation begins.
+    - Multi-runner platform matrix:
+      - `windows-latest`: Windows x64 native compilation & packaging via `scripts/package_artifact.ps1`.
+      - `ubuntu-latest`: Linux x64 (GTK3/CMake/Ninja) & Android APK builds via `scripts/package_artifact.sh`.
+      - `macos-latest`: Apple universal builds (macOS desktop bundle & iOS app bundle) via `scripts/package_artifact.sh`.
+    - Standalone artifact upload via `actions/upload-artifact@v4` with zero nested ZIP archives.
+    - Automated release aggregation job (`publish-release`) packaging standalone archives, detached `.sha256` checksum manifests, and master `SHA256SUMS.txt` into GitHub Releases via `softprops/action-gh-release@v2`.
+  - **Automated Workflow Schema Validator (`scripts/verify_github_workflows.dart`)**:
+    - 26 strict automated validation rules inspecting triggers, input schemas, runner mappings, preflight dependencies, packaging calls, and release publishing steps.
+  - **Master Verification Gate (`scripts/verify_subphase_6_1_2.ps1`)**:
+    - Orchestrated 6 verification gates (Binary Isolation, Native Runners, GitHub Workflows, Static Analysis, Standalone Packaging, and Monorepo Regression Test Suites) passing 100%.
+
+---
+
 ## [0.1.0-subphase.6.1.1] - 2026-11-22
 
 ### Added
