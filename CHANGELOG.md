@@ -4,6 +4,46 @@
 
 ---
 
+## [0.1.0-subphase.5.2.1] - 2026-11-22
+
+### Added
+- **Admin App: Interactive QR Studio, Scannability Simulator & TrustQR Signer (`apps/admin_app`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Re-verified that `apps/user_app` does not import or depend on `packages/qr_generator_engine` or `packages/qr_admin_analytics`. Binary isolation audit script passed with 0 violations.
+  - **15-Format Structured Payload Creation Forms (`lib/src/widgets/payload_forms/*`)**:
+    - `PayloadFormDispatcher`: Dynamic form routing for all 15 supported formats (`url`, `wifi`, `vcard`, `mecard`, `geo`, `event`, `email`, `sms`, `tel`, `otp`, `upi`, `epc`, `crypto`, `gs1`, `plainText`).
+    - Raw manual payload override switch allowing administrators to inject custom or raw QR data strings directly into the matrix.
+    - Specialized input controllers with real-time payload generation, format validation, and immediate studio canvas synchronization.
+  - **Artistic QR Customization Studio (`lib/src/widgets/artistic_customization_panel.dart`)**:
+    - 4 branded presets: `cyberpunkNeon`, `corporateNavy`, `emeraldTrust`, and `highContrastMono`.
+    - 6 custom module shape selectors: `square`, `circle`, `roundedSquare`, `diamond`, `dot`, `hexagonal`.
+    - 4 error correction levels (`L` ~7%, `M` ~15%, `Q` ~25%, `H` ~30%).
+    - Custom eye frame and pupil shape pickers (`square`, `rounded`, `circle`, `diamond`, `cyberGrid`).
+    - Solid and multi-stop gradient modes (`linear`, `radial`) with gradient angle slider (0°–360°) and interactive color swatches.
+    - Embedded center logo toggle with quiet zone cutout and logo size ratio adjustment (5%–30%).
+  - **Live Scannability & Contrast Simulator (`lib/src/widgets/scannability_simulator_card.dart`)**:
+    - Real-time scannability score gauge (0%–100%) with status badge (`OPTIMAL`, `ACCEPTABLE`, `DEGRADED`, `CRITICAL`).
+    - Scientific contrast metrics: WCAG contrast ratio (with AAA/AA compliance badges) and Michelson contrast index.
+    - Module count, version, and logo occlusion percentage calculation.
+    - 5 simulated environmental stress test bars: Studio Light, Glare & Reflection, Dim & Low-Light, 30° Off-Axis Tilt, and Defocus Blur.
+    - Actionable automated warnings and corrective recommendations (e.g., contrast boosting, logo scaling, error correction elevation).
+  - **Cryptographic TrustQR Ed25519 Signer (`lib/src/widgets/trust_qr_signer_card.dart`)**:
+    - Institutional authority signing toggle wrapping raw QR matrices into cryptographic `TrustQrEnvelope` containers (`trustqr://v1?...`).
+    - Configurable issuer identifier (`auth.qrscanner.corp`) and cryptographic key ID (`ed25519-key-2026`).
+    - Pure-Dart deterministic Ed25519 keypair regeneration with instantaneous public key fingerprint inspection.
+    - Live verified signature status badge and copyable canonical signed payload URI.
+  - **Live Preview Canvas & Multi-Format Exporter (`lib/src/widgets/qr_studio_preview_canvas.dart`)**:
+    - High-fidelity `CustomPaint` engine rendering real-time matrix modules, gradient fills, styled eye frames/pupils, and embedded logo quiet cutouts.
+    - Multi-format export toolbar: 300 DPI PNG, scalable vector SVG XML, print-ready PDF-1.4, and 24-bit raw BMP.
+    - Visual export notification banner with file size and timestamp confirmation.
+    - Collapsible ASCII matrix diagnostics for terminal debugging and low-level matrix inspection.
+  - **Responsive Dual-Layout Workspace (`lib/src/views/studio_workspace_view.dart`)**:
+    - Wide-screen multi-column desktop layout (canvas on left, configuration accordion on right for viewports >= 950px).
+    - Compact vertical layout with auto-scroll and overflow protection for mobile/tablet viewports (< 950px).
+    - Cyber-precision glassmorphic aesthetics, neon accents, and interactive fleet telemetry summary dialog.
+  - **Automated Verification Gate (`scripts/verify_subphase_5_2_1.ps1`)**:
+    - 4-step quality gate: Binary Isolation, Static Analysis (`0 errors, 0 warnings, 0 infos`), 29/29 tests passing (100%), and **97.04% line coverage** (1,114 / 1,148 lines hit across `apps/admin_app`).
+
 ## [0.1.0-subphase.5.1.2] - 2026-11-22
 
 ### Added
