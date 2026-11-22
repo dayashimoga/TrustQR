@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import '../accessibility/cyber_accessibility.dart';
 import 'cyber_colors.dart';
 import 'cyber_tokens.dart';
 import 'cyber_typography.dart';
 
-/// Comprehensive Cyber-Precision theme generator for dark and light modes.
+/// Comprehensive Cyber-Precision theme generator for dark, light, and high-contrast modes.
 class CyberTheme {
   /// Generates the futuristic dark cyber-precision theme.
   static ThemeData dark() {
@@ -150,5 +151,116 @@ class CyberTheme {
         space: 1,
       ),
     );
+  }
+
+  /// High-contrast dark theme exceeding WCAG AAA contrast requirements (>7:1).
+  static ThemeData highContrastDark() {
+    final textTheme = CyberTypography.createTextTheme(isDark: true).apply(
+      bodyColor: Colors.white,
+      displayColor: Colors.white,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: Colors.black,
+      colorScheme: const ColorScheme.dark(
+        primary: CyberColors.neonCyan,
+        onPrimary: Colors.black,
+        secondary: CyberColors.neonEmerald,
+        onSecondary: Colors.black,
+        surface: Color(0xFF0A0F1D),
+        onSurface: Colors.white,
+        error: Color(0xFFFF1744),
+        onError: Colors.black,
+        outline: Colors.white,
+      ),
+      textTheme: textTheme,
+      cardTheme: CardThemeData(
+        color: const Color(0xFF0A0F1D),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CyberTokens.radiusMd),
+          side: const BorderSide(color: Colors.white, width: CyberTokens.borderWidthBold),
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.black,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
+        ),
+        iconTheme: IconThemeData(color: CyberColors.neonCyan),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Colors.white,
+        thickness: 2.0,
+        space: 2.0,
+      ),
+    );
+  }
+
+  /// High-contrast light theme exceeding WCAG AAA contrast requirements (>7:1).
+  static ThemeData highContrastLight() {
+    final textTheme = CyberTypography.createTextTheme(isDark: false).apply(
+      bodyColor: Colors.black,
+      displayColor: Colors.black,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: Colors.white,
+      colorScheme: const ColorScheme.light(
+        primary: Color(0xFF0033CC),
+        onPrimary: Colors.white,
+        secondary: Color(0xFF007A3D),
+        onSecondary: Colors.white,
+        surface: Colors.white,
+        onSurface: Colors.black,
+        error: Color(0xFFB71C1C),
+        onError: Colors.white,
+        outline: Colors.black,
+      ),
+      textTheme: textTheme,
+      cardTheme: CardThemeData(
+        color: Colors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CyberTokens.radiusMd),
+          side: const BorderSide(color: Colors.black, width: CyberTokens.borderWidthBold),
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.2,
+        ),
+        iconTheme: IconThemeData(color: Color(0xFF0033CC)),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: Colors.black,
+        thickness: 2.0,
+        space: 2.0,
+      ),
+    );
+  }
+
+  /// Automatically resolves the appropriate theme based on context and accessibility flags.
+  static ThemeData resolve(BuildContext context, {bool isDark = true, bool? highContrast}) {
+    final isHc = highContrast ?? CyberAccessibility.isHighContrast(context);
+    if (isHc) {
+      return isDark ? highContrastDark() : highContrastLight();
+    }
+    return isDark ? dark() : light();
   }
 }

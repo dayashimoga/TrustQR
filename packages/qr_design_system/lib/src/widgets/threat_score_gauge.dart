@@ -1,16 +1,21 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../accessibility/cyber_accessibility.dart';
+import '../l10n/cyber_localizations.dart';
 import '../tokens/cyber_colors.dart';
 import '../tokens/cyber_tokens.dart';
 import '../tokens/cyber_typography.dart';
 
 /// Animated circular safety gauge visualizing Threat Firewall assessment scores (0–100).
+///
+/// Complies with WCAG 2.1 AA screen-reader semantics and respects reduced-motion preferences.
 class ThreatScoreGauge extends StatefulWidget {
   final double score;
   final double size;
   final double strokeWidth;
   final String? title;
   final bool showLabel;
+  final bool? reducedMotion;
 
   const ThreatScoreGauge({
     super.key,
@@ -19,6 +24,7 @@ class ThreatScoreGauge extends StatefulWidget {
     this.strokeWidth = 10.0,
     this.title,
     this.showLabel = true,
+    this.reducedMotion,
   });
 
   @override
@@ -39,7 +45,12 @@ class _ThreatScoreGaugeState extends State<ThreatScoreGauge> with SingleTickerPr
     _animation = Tween<double>(begin: 0.0, end: widget.score.clamp(0.0, 100.0)).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
-    _controller.forward();
+
+    if (widget.reducedMotion != true) {
+      _controller.forward();
+    } else {
+      _controller.value = 1.0;
+    }
   }
 
   @override
@@ -50,7 +61,12 @@ class _ThreatScoreGaugeState extends State<ThreatScoreGauge> with SingleTickerPr
         begin: _animation.value,
         end: widget.score.clamp(0.0, 100.0),
       ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
-      _controller.forward(from: 0.0);
+
+      if (widget.reducedMotion == true) {
+        _controller.value = 1.0;
+      } else {
+        _controller.forward(from: 0.0);
+      }
     }
   }
 
@@ -66,20 +82,32 @@ class _ThreatScoreGaugeState extends State<ThreatScoreGauge> with SingleTickerPr
     return CyberColors.neonCrimson;
   }
 
-  String _getScoreRating(double s) {
-    if (s >= 80.0) return 'SECURE';
-    if (s >= 50.0) return 'CAUTION';
-    return 'CRITICAL';
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (widget.title != null) ...[
+    final localizations = CyberLocalizations.of(context);
+    final isReducedMotion = widget.reducedMotion ?? CyberAccessibility.isReducedMotion(context);
+
+    if (isReducedMotion && _controller.isAnimating) {
+      _controller.stop();
+      _controller.value = 1.0;
+    }
+
+    final effectiveVal = isReducedMotion
+        ? widget.score.clamp(0.0, 100.0)
+        : _animation.value;
+    final rating = localizations.threatRating(effectiveVal);
+    final titleText = widget.title ?? localizations.threatScore;
+
+    return Semantics(
+      container: true,
+      label: titleText,
+      value: localizations.threatScoreReading(effectiveVal.toInt(), rating),
+      hint: localizations.a11yThreatGaugeHint,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
           Text(
-            widget.title!,
+            titleText,
             style: CyberTypography.monospace(
               fontSize: 12,
               fontWeight: FontWeight.w700,
@@ -88,67 +116,72 @@ class _ThreatScoreGaugeState extends State<ThreatScoreGauge> with SingleTickerPr
             ),
           ),
           const SizedBox(height: CyberTokens.spacingSm),
-        ],
-        SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: AnimatedBuilder(
-            animation: _animation,
-            builder: (context, child) {
-              final val = _animation.value;
-              final color = _getScoreColor(val);
-              final rating = _getScoreRating(val);
+          SizedBox(
+            width: widget.size,
+            height: widget.size,
+            child: AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) {
+                final val = isReducedMotion ? widget.score.clamp(0.0, 100.0) : _animation.value;
+                final color = _getScoreColor(val);
+                final currentRating = localizations.threatRating(val);
 
-              return CustomPaint(
-                painter: _GaugePainter(
-                  scoreRatio: val / 100.0,
-                  strokeWidth: widget.strokeWidth,
-                  color: color,
-                ),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        val.round().toString(),
-                        style: TextStyle(
-                          fontSize: widget.size * 0.28,
-                          fontWeight: FontWeight.w800,
-                          color: color,
-                          letterSpacing: -0.5,
-                        ),
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CustomPaint(
+                      size: Size(widget.size, widget.size),
+                      painter: _ThreatGaugePainter(
+                        score: val,
+                        color: color,
+                        strokeWidth: widget.strokeWidth,
                       ),
-                      if (widget.showLabel)
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         Text(
-                          rating,
+                          val.toStringAsFixed(0),
                           style: CyberTypography.monospace(
-                            fontSize: widget.size * 0.08,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
                             color: color,
-                            letterSpacing: 1.0,
                           ),
                         ),
-                    ],
-                  ),
-                ),
-              );
-            },
+                        if (widget.showLabel) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            currentRating,
+                            style: CyberTypography.monospace(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: color,
+                              letterSpacing: 1.0,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _GaugePainter extends CustomPainter {
-  final double scoreRatio;
-  final double strokeWidth;
+class _ThreatGaugePainter extends CustomPainter {
+  final double score;
   final Color color;
+  final double strokeWidth;
 
-  _GaugePainter({
-    required this.scoreRatio,
-    required this.strokeWidth,
+  _ThreatGaugePainter({
+    required this.score,
     required this.color,
+    required this.strokeWidth,
   });
 
   @override
@@ -156,62 +189,46 @@ class _GaugePainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    const startAngle = 0.75 * math.pi; // 135 degrees
-    const totalSweep = 1.5 * math.pi; // 270 degrees arc
+    const startAngle = 135.0 * (math.pi / 180.0);
+    const sweepTotalAngle = 270.0 * (math.pi / 180.0);
 
-    // 1. Background Track Ring
+    // Track Paint
     final trackPaint = Paint()
-      ..color = CyberColors.slateBorder.withValues(alpha: 0.35)
+      ..color = CyberColors.slateBorder
       ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
 
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       startAngle,
-      totalSweep,
+      sweepTotalAngle,
       false,
       trackPaint,
     );
 
-    // 2. Active Progress Arc with Glow
-    final activeSweep = totalSweep * scoreRatio.clamp(0.0, 1.0);
-
-    if (activeSweep > 0) {
-      final glowPaint = Paint()
-        ..color = color.withValues(alpha: 0.35)
-        ..strokeWidth = strokeWidth + 4.0
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6.0);
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        activeSweep,
-        false,
-        glowPaint,
-      );
-
-      final arcPaint = Paint()
+    // Progress Arc Paint
+    final progressSweep = sweepTotalAngle * (score.clamp(0.0, 100.0) / 100.0);
+    if (progressSweep > 0) {
+      final progressPaint = Paint()
         ..color = color
         ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke;
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
 
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         startAngle,
-        activeSweep,
+        progressSweep,
         false,
-        arcPaint,
+        progressPaint,
       );
     }
   }
 
   @override
-  bool shouldRepaint(covariant _GaugePainter oldDelegate) {
-    return oldDelegate.scoreRatio != scoreRatio ||
+  bool shouldRepaint(covariant _ThreatGaugePainter oldDelegate) {
+    return oldDelegate.score != score ||
         oldDelegate.color != color ||
         oldDelegate.strokeWidth != strokeWidth;
   }

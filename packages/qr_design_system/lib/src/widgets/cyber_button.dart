@@ -28,6 +28,8 @@ class CyberButton extends StatelessWidget {
   final double height;
   final double? width;
   final bool isFullWidth;
+  final String? tooltip;
+  final String? semanticHint;
 
   const CyberButton({
     super.key,
@@ -39,6 +41,8 @@ class CyberButton extends StatelessWidget {
     this.height = 48.0,
     this.width,
     this.isFullWidth = false,
+    this.tooltip,
+    this.semanticHint,
   });
 
   @override
@@ -133,11 +137,23 @@ class CyberButton extends StatelessWidget {
       ),
     );
 
-    return Semantics(
+    final effectiveLabel = isLoading ? '$label, loading' : label;
+
+    final semanticsWidget = Semantics(
       button: true,
       enabled: isEnabled,
-      label: label,
+      label: effectiveLabel,
+      hint: semanticHint ?? tooltip,
       child: buttonWidget,
     );
+
+    if (tooltip != null) {
+      return Tooltip(
+        message: tooltip!,
+        child: semanticsWidget,
+      );
+    }
+
+    return semanticsWidget;
   }
 }

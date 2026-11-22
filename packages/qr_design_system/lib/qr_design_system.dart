@@ -1,4 +1,4 @@
-/// Cyber-Precision glassmorphic design tokens and widgets.
+/// Cyber-Precision glassmorphic design tokens, widgets, accessibility, and localizations.
 library qr_design_system;
 
 export 'src/tokens/cyber_colors.dart';
@@ -14,6 +14,8 @@ export 'src/widgets/threat_score_gauge.dart';
 export 'src/widgets/trust_qr_badge.dart';
 export 'src/layout/responsive_layout.dart';
 export 'src/layout/adaptive_workspace_shell.dart';
+export 'src/accessibility/cyber_accessibility.dart';
+export 'src/l10n/cyber_localizations.dart';
 
 // Backward compatibility aliases
 export 'src/glass/cyber_glass_card.dart' show CyberGlassCard;

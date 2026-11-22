@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../accessibility/cyber_accessibility.dart';
+import '../l10n/cyber_localizations.dart';
 import '../tokens/cyber_colors.dart';
 import '../tokens/cyber_tokens.dart';
 import '../tokens/cyber_typography.dart';
@@ -23,7 +25,7 @@ enum ScannerHudState {
 }
 
 /// Interactive futuristic HUD scanner reticle with animated corner tracking brackets,
-/// laser sweep line, and threat state transitions.
+/// laser sweep line, threat state transitions, WCAG semantics, and reduced-motion support.
 class HudScannerReticle extends StatefulWidget {
   final ScannerHudState state;
   final double reticleSize;
@@ -33,6 +35,7 @@ class HudScannerReticle extends StatefulWidget {
   final bool showCrosshair;
   final String? statusText;
   final Widget? centerOverlay;
+  final bool? reducedMotion;
 
   const HudScannerReticle({
     super.key,
@@ -44,6 +47,7 @@ class HudScannerReticle extends StatefulWidget {
     this.showCrosshair = true,
     this.statusText,
     this.centerOverlay,
+    this.reducedMotion,
   });
 
   @override
@@ -66,7 +70,7 @@ class _HudScannerReticleState extends State<HudScannerReticle> with SingleTicker
       curve: Curves.easeInOut,
     );
 
-    if (widget.state == ScannerHudState.scanning) {
+    if (widget.state == ScannerHudState.scanning && widget.reducedMotion != true) {
       _sweepController.repeat(reverse: true);
     }
   }
@@ -74,9 +78,10 @@ class _HudScannerReticleState extends State<HudScannerReticle> with SingleTicker
   @override
   void didUpdateWidget(covariant HudScannerReticle oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.state == ScannerHudState.scanning && !_sweepController.isAnimating) {
+    final isReduced = widget.reducedMotion ?? false;
+    if (widget.state == ScannerHudState.scanning && !isReduced && !_sweepController.isAnimating) {
       _sweepController.repeat(reverse: true);
-    } else if (widget.state != ScannerHudState.scanning && _sweepController.isAnimating) {
+    } else if ((widget.state != ScannerHudState.scanning || isReduced) && _sweepController.isAnimating) {
       _sweepController.stop();
     }
   }
@@ -102,93 +107,98 @@ class _HudScannerReticleState extends State<HudScannerReticle> with SingleTicker
     }
   }
 
-  String _getDefaultStatusText() {
-    switch (widget.state) {
-      case ScannerHudState.idle:
-        return 'READY // ALIGN QR CODE';
-      case ScannerHudState.scanning:
-        return 'SCANNING // ZERO-TRUST FIREWALL ACTIVE';
-      case ScannerHudState.safe:
-        return 'VERIFIED // SAFE PAYLOAD';
-      case ScannerHudState.warning:
-        return 'CAUTION // SUSPICIOUS ANOMALY';
-      case ScannerHudState.threat:
-        return 'THREAT DETECTED // ACCESS QUARANTINED';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final stateColor = _getStateColor();
-    final statusText = widget.statusText ?? _getDefaultStatusText();
+    final localizations = CyberLocalizations.of(context);
+    final isReducedMotion = widget.reducedMotion ?? CyberAccessibility.isReducedMotion(context);
 
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: widget.reticleSize,
-            height: widget.reticleSize,
-            child: AnimatedBuilder(
-              animation: _sweepAnimation,
-              builder: (context, child) {
-                return CustomPaint(
-                  painter: _HudReticlePainter(
-                    stateColor: stateColor,
-                    cornerLength: widget.cornerLength,
-                    strokeWidth: widget.cornerStrokeWidth,
-                    sweepPosition: widget.state == ScannerHudState.scanning ? _sweepAnimation.value : null,
-                    showCrosshair: widget.showCrosshair,
-                  ),
-                  child: widget.centerOverlay != null
-                      ? Center(child: widget.centerOverlay)
-                      : null,
-                );
-              },
+    // Adjust controller if reduced motion dynamically enabled
+    if (isReducedMotion && _sweepController.isAnimating) {
+      _sweepController.stop();
+    } else if (!isReducedMotion && widget.state == ScannerHudState.scanning && !_sweepController.isAnimating) {
+      _sweepController.repeat(reverse: true);
+    }
+
+    final stateColor = _getStateColor();
+    final statusText = widget.statusText ?? localizations.reticleStatus(widget.state);
+
+    final sweepPosition = isReducedMotion
+        ? (widget.state == ScannerHudState.scanning ? 0.5 : null)
+        : (widget.state == ScannerHudState.scanning ? _sweepAnimation.value : null);
+
+    return Semantics(
+      container: true,
+      liveRegion: true,
+      label: localizations.a11yScannerReticle,
+      value: statusText,
+      hint: localizations.a11yScannerReticleHint,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: widget.reticleSize,
+              height: widget.reticleSize,
+              child: AnimatedBuilder(
+                animation: _sweepAnimation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: _HudReticlePainter(
+                      stateColor: stateColor,
+                      cornerLength: widget.cornerLength,
+                      strokeWidth: widget.cornerStrokeWidth,
+                      sweepPosition: widget.showLaserSweep ? sweepPosition : null,
+                      showCrosshair: widget.showCrosshair,
+                    ),
+                    child: widget.centerOverlay != null
+                        ? Center(child: widget.centerOverlay)
+                        : null,
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: CyberTokens.spacingMd),
-          // HUD Status Telemetry Tag
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: CyberColors.obsidianBackground.withValues(alpha: 0.85),
-              borderRadius: BorderRadius.circular(CyberTokens.radiusPill),
-              border: Border.all(color: stateColor.withValues(alpha: 0.5), width: 1.0),
-              boxShadow: CyberTokens.neonGlow(stateColor, blur: 8.0),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: stateColor,
-                    shape: BoxShape.circle,
-                    boxShadow: CyberTokens.neonGlow(stateColor, blur: 6.0),
+            const SizedBox(height: CyberTokens.spacingMd),
+            // HUD Status Telemetry Tag
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: CyberColors.obsidianBackground.withValues(alpha: 0.85),
+                borderRadius: BorderRadius.circular(CyberTokens.radiusPill),
+                border: Border.all(color: stateColor.withValues(alpha: 0.5), width: 1.0),
+                boxShadow: CyberTokens.neonGlow(stateColor, blur: 8.0),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: stateColor,
+                      shape: BoxShape.circle,
+                      boxShadow: CyberTokens.neonGlow(stateColor, blur: 4.0),
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  statusText,
-                  style: CyberTypography.monospace(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: stateColor,
-                    letterSpacing: 1.2,
+                  const SizedBox(width: 8),
+                  Text(
+                    statusText,
+                    style: CyberTypography.monospace(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: stateColor,
+                      letterSpacing: 1.0,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-/// Custom painter for rendering glowing corner tracking brackets, crosshair, and laser sweep.
 class _HudReticlePainter extends CustomPainter {
   final Color stateColor;
   final double cornerLength;
@@ -209,96 +219,82 @@ class _HudReticlePainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Corner Paint with Glow
+    // Corner Paint (Cyber Brackets)
     final cornerPaint = Paint()
       ..color = stateColor
       ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+
+    // Subtle guide grid paint
+    final guidePaint = Paint()
+      ..color = stateColor.withValues(alpha: 0.12)
+      ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
-    final glowPaint = Paint()
-      ..color = stateColor.withValues(alpha: 0.4)
-      ..strokeWidth = strokeWidth + 3.0
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4.0);
+    // Draw full outer bounding guide (faint)
+    canvas.drawRect(Rect.fromLTWH(0, 0, w, h), guidePaint);
 
-    // 1. Top-Left Corner
-    _drawCorner(canvas, glowPaint, 0, 0, cornerLength, true, true);
-    _drawCorner(canvas, cornerPaint, 0, 0, cornerLength, true, true);
+    // Draw 4 corner brackets
+    // Top-Left
+    canvas.drawLine(const Offset(0, 0), Offset(cornerLength, 0), cornerPaint);
+    canvas.drawLine(const Offset(0, 0), Offset(0, cornerLength), cornerPaint);
 
-    // 2. Top-Right Corner
-    _drawCorner(canvas, glowPaint, w, 0, cornerLength, false, true);
-    _drawCorner(canvas, cornerPaint, w, 0, cornerLength, false, true);
+    // Top-Right
+    canvas.drawLine(Offset(w, 0), Offset(w - cornerLength, 0), cornerPaint);
+    canvas.drawLine(Offset(w, 0), Offset(w, cornerLength), cornerPaint);
 
-    // 3. Bottom-Left Corner
-    _drawCorner(canvas, glowPaint, 0, h, cornerLength, true, false);
-    _drawCorner(canvas, cornerPaint, 0, h, cornerLength, true, false);
+    // Bottom-Left
+    canvas.drawLine(Offset(0, h), Offset(cornerLength, h), cornerPaint);
+    canvas.drawLine(Offset(0, h), Offset(0, h - cornerLength), cornerPaint);
 
-    // 4. Bottom-Right Corner
-    _drawCorner(canvas, glowPaint, w, h, cornerLength, false, false);
-    _drawCorner(canvas, cornerPaint, w, h, cornerLength, false, false);
+    // Bottom-Right
+    canvas.drawLine(Offset(w, h), Offset(w - cornerLength, h), cornerPaint);
+    canvas.drawLine(Offset(w, h), Offset(w, h - cornerLength), cornerPaint);
 
-    // 5. Crosshairs at Center
+    // Center Crosshair target
     if (showCrosshair) {
-      final crossPaint = Paint()
-        ..color = stateColor.withValues(alpha: 0.35)
-        ..strokeWidth = 1.0;
+      final crosshairPaint = Paint()
+        ..color = stateColor.withValues(alpha: 0.40)
+        ..strokeWidth = 1.5;
+      const crossSize = 12.0;
       final cx = w / 2;
       final cy = h / 2;
-      const gap = 8.0;
-      const arm = 14.0;
 
-      canvas.drawLine(Offset(cx - gap - arm, cy), Offset(cx - gap, cy), crossPaint);
-      canvas.drawLine(Offset(cx + gap, cy), Offset(cx + gap + arm, cy), crossPaint);
-      canvas.drawLine(Offset(cx, cy - gap - arm), Offset(cx, cy - gap), crossPaint);
-      canvas.drawLine(Offset(cx, cy + gap), Offset(cx, cy + gap + arm), crossPaint);
+      canvas.drawLine(Offset(cx - crossSize, cy), Offset(cx - 3, cy), crosshairPaint);
+      canvas.drawLine(Offset(cx + 3, cy), Offset(cx + crossSize, cy), crosshairPaint);
+      canvas.drawLine(Offset(cx, cy - crossSize), Offset(cx, cy - 3), crosshairPaint);
+      canvas.drawLine(Offset(cx, cy + 3), Offset(cx, cy + crossSize), crosshairPaint);
     }
 
-    // 6. Laser Sweep Line
+    // Animated Laser Sweep Line & Gradient Trail
     if (sweepPosition != null) {
-      final sweepY = h * sweepPosition!;
+      final y = sweepPosition! * h;
       final laserPaint = Paint()
         ..color = stateColor
         ..strokeWidth = 2.0;
 
-      final laserGlow = Paint()
+      // Glow beam
+      final glowPaint = Paint()
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
-            Colors.transparent,
+            stateColor.withValues(alpha: 0.0),
             stateColor.withValues(alpha: 0.25),
-            stateColor.withValues(alpha: 0.8),
           ],
-        ).createShader(Rect.fromLTRB(0, math.max(0, sweepY - 24), w, sweepY));
+        ).createShader(Rect.fromLTWH(0, math.max(0, y - 24), w, 24));
 
-      // Glow beam trail above sweep line
-      canvas.drawRect(Rect.fromLTRB(4, math.max(0, sweepY - 24), w - 4, sweepY), laserGlow);
+      canvas.drawRect(Rect.fromLTWH(0, math.max(0, y - 24), w, 24), glowPaint);
+      canvas.drawLine(Offset(0, y), Offset(w, y), laserPaint);
 
-      // Sharp laser line
-      canvas.drawLine(Offset(4, sweepY), Offset(w - 4, sweepY), laserPaint);
+      // Edge laser nodes
+      final nodePaint = Paint()
+        ..color = stateColor
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(Offset(0, y), 3.0, nodePaint);
+      canvas.drawCircle(Offset(w, y), 3.0, nodePaint);
     }
-  }
-
-  void _drawCorner(
-    Canvas canvas,
-    Paint paint,
-    double x,
-    double y,
-    double len,
-    bool isLeft,
-    bool isTop,
-  ) {
-    final dx = isLeft ? len : -len;
-    final dy = isTop ? len : -len;
-
-    final path = Path()
-      ..moveTo(x + dx, y)
-      ..lineTo(x, y)
-      ..lineTo(x, y + dy);
-
-    canvas.drawPath(path, paint);
   }
 
   @override
@@ -306,6 +302,6 @@ class _HudReticlePainter extends CustomPainter {
     return oldDelegate.stateColor != stateColor ||
         oldDelegate.sweepPosition != sweepPosition ||
         oldDelegate.cornerLength != cornerLength ||
-        oldDelegate.strokeWidth != strokeWidth;
+        oldDelegate.showCrosshair != showCrosshair;
   }
 }

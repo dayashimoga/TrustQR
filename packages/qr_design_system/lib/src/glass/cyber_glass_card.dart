@@ -4,6 +4,8 @@ import '../tokens/cyber_colors.dart';
 import '../tokens/cyber_tokens.dart';
 
 /// Translucent frosted glass container widget with subtle border sheen and glow.
+///
+/// Supports WCAG screen-reader semantics and accessibility hints.
 class CyberGlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -18,6 +20,8 @@ class CyberGlassCard extends StatelessWidget {
   final Color? glowColor;
   final double? width;
   final double? height;
+  final String? semanticLabel;
+  final String? semanticHint;
 
   const CyberGlassCard({
     super.key,
@@ -34,6 +38,8 @@ class CyberGlassCard extends StatelessWidget {
     this.glowColor,
     this.width,
     this.height,
+    this.semanticLabel,
+    this.semanticHint,
   });
 
   @override
@@ -103,6 +109,16 @@ class CyberGlassCard extends StatelessWidget {
 
     if (margin != null) {
       result = Padding(padding: margin!, child: result);
+    }
+
+    if (onTap != null || semanticLabel != null) {
+      result = Semantics(
+        button: onTap != null,
+        enabled: onTap != null,
+        label: semanticLabel,
+        hint: semanticHint,
+        child: result,
+      );
     }
 
     return result;

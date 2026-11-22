@@ -34,6 +34,7 @@ class CyberTokens {
   static const double borderWidthThin = 1.0;
   static const double borderWidthMedium = 1.5;
   static const double borderWidthThick = 2.0;
+  static const double borderWidthBold = 2.5;
 
   // Layout Spacing & Paddings
   static const double spacingXs = 4.0;
