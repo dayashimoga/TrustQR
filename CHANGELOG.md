@@ -4,6 +4,50 @@
 
 ---
 
+## [0.1.0-subphase.5.2.2] - 2026-11-22
+
+### Added
+- **Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace (`apps/admin_app`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Re-verified that `apps/user_app` does not import or depend on `packages/qr_generator_engine` or `packages/qr_admin_analytics`. Binary isolation audit script passed with 0 violations.
+  - **Cryptographic RBAC Entitlement Guard (`lib/src/state/auth_controller.dart`, `lib/src/views/rbac_guard_view.dart`)**:
+    - Pure-Dart Ed25519 cryptographic token issuance, validation, and session lifecycle management.
+    - Strict `UserRole` enforcement: allows `UserRole.admin` access while intercepting `UserRole.user` or unauthenticated sessions.
+    - Futuristic cyber access denial screen featuring shield icon, reason banner, quick operator sign-in, user simulation test button, and custom token validation dialog.
+  - **Adaptive Multi-Pane Navigation Shell (`lib/src/state/admin_nav_controller.dart`, `lib/src/views/admin_shell_view.dart`)**:
+    - Multi-pane workspace navigation managing 5 distinct admin consoles: QR Studio, Batch Generator, Fleet Analytics, Audit Trail, and Admin Settings.
+    - Dual responsive layout utilizing `AdaptiveWorkspaceShell`: compact navigation bar for mobile/tablet and wide persistent navigation rail for desktop/laptop.
+    - Integrated operator identity card, active role badge (`ADMIN`), and session termination action in top app bar.
+  - **High-Throughput Batch QR Generator (`lib/src/state/batch_controller.dart`, `lib/src/views/batch_generator_view.dart`)**:
+    - Dual ingestion pipeline supporting structured CSV and JSON input with syntax validation and line error diagnostics.
+    - 3 enterprise preset loaders: Corporate Asset Tags, Employee Security Badges, and Branch Office Wi-Fi Stations.
+    - Automated batch generation with individual scannability scoring via `ScannabilitySimulator` (WCAG contrast, module dimensions, warning flags).
+    - Multi-format archive export pipeline (PNG, SVG, PDF) packaging generated codes into pure-Dart uncompressed/deflate PKZIP archives with SHA-256 fingerprint verification card.
+  - **Executive Fleet Telemetry & Threat Dashboard (`lib/src/state/analytics_controller.dart`, `lib/src/views/analytics_dashboard_view.dart`)**:
+    - Direct integration with `AdminAnalyticsFacade` populated with multi-device telemetry across 15 QR payload formats and 5 OS platforms.
+    - 4 high-level KPI summary cards: Total Scans, Total Generations, Active Fleet Devices, and Threats Mitigated.
+    - Interactive time-series bar chart with hourly/daily/weekly aggregation and automated anomaly markers.
+    - 15-format distribution breakdown bars and threat risk severity histogram (0.0 to 1.0).
+    - Malicious domain intelligence table highlighting high-risk targets (`malicious-pay.top`, `phishing-credential-harvest.ru`, etc.).
+    - Fleet device management card with remote token revocation, device quarantine, and restoration actions.
+    - Canonical export toolbar triggering instant downloads of unified JSON telemetry and 4 canonical CSV reports.
+  - **Cryptographic HMAC-SHA256 Audit Trail Browser (`lib/src/views/audit_trail_view.dart`)**:
+    - Administrative action history viewer with tamper-detection verification button evaluating cryptographic HMAC-SHA256 integrity chains.
+    - Real-time search filter by action type or actor identifier.
+    - Detailed event inspection cards with actor metadata, timestamp stamps, and full cryptographic SHA-256 integrity hashes.
+  - **Admin Security & Settings Console (`lib/src/views/admin_settings_view.dart`)**:
+    - Operator session profile with signed token preview and expiration countdown.
+    - Institutional trust anchor card displaying active Ed25519 issuer identity and base64 public key fingerprint.
+    - System security posture status card verifying binary isolation, token signing, and tamper detection.
+    - Interactive penetration testing simulation controls: switch to restricted user role, simulate token expiration, and sign out.
+  - **Comprehensive Verification Suite (`scripts/verify_subphase_5_2_2.ps1`)**:
+    - 79 passing automated unit, widget, and integration tests across `apps/admin_app` (100% pass rate).
+    - **96.77% line coverage** (2,308 / 2,385 lines hit across `apps/admin_app`), exceeding the mandatory `>= 95.0%` quality gate.
+    - 0 static analyzer issues across the entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`).
+    - 100% physical and cryptographic binary isolation confirmed by automated checks.
+
+---
+
 ## [0.1.0-subphase.5.2.1] - 2026-11-22
 
 ### Added

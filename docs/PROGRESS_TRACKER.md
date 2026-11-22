@@ -11,9 +11,9 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 19 / 24 (`79.17%`)
-- **Current Active Subphase**: `5.2.2` (`PENDING` — Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace)
-- **Next Subphase**: `6.1.1` (`PENDING` — Cross-Platform Native Runner Configs & Standalone Packaging Scripts)
+- **Verified Subphases**: 20 / 24 (`83.33%`)
+- **Current Active Subphase**: `6.1.1` (`PENDING` — Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets))
+- **Next Subphase**: `6.1.2` (`PENDING` — GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector))
 - **Blocked Subphases**: 0
 
 ---
@@ -41,7 +41,7 @@
 | **5.1.1** | S5 / P5.1 | Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports | 35 min | 18 min | `VERIFIED` | 99.02% line coverage (913/922 lines hit, 26/26 tests pass, 0 analyzer issues) | `packages/qr_admin_analytics/lib/*`, `packages/qr_admin_analytics/test/*`, `scripts/verify_subphase_5_1_1.ps1` |
 | **5.1.2** | S5 / P5.1 | Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage) | 25 min | 12 min | `VERIFIED` | 98.92% line coverage (912/922 lines hit, 46/46 tests pass, 0 analyzer issues) | `packages/qr_admin_analytics/test/*`, `scripts/verify_subphase_5_1_2.ps1` |
 | **5.2.1** | S5 / P5.2 | Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer | 45 min | 22 min | `VERIFIED` | 97.04% line coverage (1114/1148 lines hit, 29/29 tests pass, 0 analyzer issues) | `apps/admin_app/lib/src/*`, `apps/admin_app/test/*`, `scripts/verify_subphase_5_2_1.ps1` |
-| **5.2.2** | S5 / P5.2 | Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **5.2.2** | S5 / P5.2 | Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace | 40 min | 24 min | `VERIFIED` | 96.77% line coverage (2308/2385 lines hit, 79/79 tests pass, 0 analyzer issues) | `apps/admin_app/lib/src/*`, `apps/admin_app/test/*`, `scripts/verify_subphase_5_2_2.ps1` |
 | **6.1.1** | S6 / P6.1 | Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets) | 35 min | — | `PENDING` | Pending | — |
 | **6.1.2** | S6 / P6.1 | GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector) | 35 min | — | `PENDING` | Pending | — |
 | **6.2.1** | S6 / P6.2 | Full-Ecosystem E2E Tests, `>=95%` Coverage Audit, RBAC Audit & Native Build Validation | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |

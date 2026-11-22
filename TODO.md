@@ -25,7 +25,7 @@
 - [x] **Subphase 5.1.1**: Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports
 - [x] **Subphase 5.1.2**: Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage)
 - [x] **Subphase 5.2.1**: Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer
-- [ ] **Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace
+- [x] **Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace
 - [ ] **Subphase 6.1.1**: Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets)
 - [ ] **Subphase 6.1.2**: GitHub Actions CI/CD Workflows (Full Matrix + On-Demand App/Platform Selector)
 - [ ] **Subphase 6.2.1**: Full-Ecosystem E2E Tests, `>=95%` Coverage Audit, RBAC Audit & Native Build Validation
@@ -212,3 +212,25 @@
   - Implemented `StudioWorkspaceView` responsive layout (wide multi-column desktop vs compact mobile) with cyber glassmorphic aesthetics and fleet telemetry dialog.
   - Quality Gates: Achieved **97.04% line coverage** (1,114 / 1,148 lines hit), 29/29 tests passing (100%), 0 static analyzer issues across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% compile-time binary isolation confirmed. Automated gate script `scripts/verify_subphase_5_2_1.ps1`.
 - **[2026-11-22T13:13:00+05:30] [PAUSE] Awaiting User Confirmation to Begin Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace.
+- **[2026-11-22T13:16:00+05:30] [START] Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace.
+  - Implement RBAC Entitlement Guard: Cryptographic token validation, role checking (admin vs user/guest), denial view with unlock dialog, session persistence.
+  - Implement Multi-Pane Navigation System: Adaptive NavigationRail / Drawer / BottomBar with 5 core panes: QR Studio, Batch Generator, Fleet Analytics, Audit Trail, Settings & Security.
+  - Implement Batch Generator View & Controller: Multi-format CSV/JSON parser, batch generation pipeline, real-time progress & error metrics, batch scannability scoring, and single/batch ZIP archive export.
+  - Implement Fleet Analytics Dashboard View: Time-series trend graphs, 15-format distribution metrics, security threat severity histogram, top malicious domains table, fleet device status & token revocation controls, canonical CSV/JSON export actions.
+  - Implement Audit Trail View: HMAC-SHA256 verified administrative action log browser, multi-criteria filtering, tamper-detection indicator, and log export.
+  - Implement Admin Settings & Security View: Session info, active Ed25519 institutional keys, theme toggles, and security posture checks.
+  - Target: 100% passing tests with mandatory `>= 95.0%` line coverage and 0 static analyzer issues across all packages.
+- **[2026-11-22T13:38:00+05:30] [COMPLETED] Subphase 5.2.2**: Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace.
+  - Implemented `AuthController` with pure-Dart Ed25519 token issuance, token verification, role enforcement, and simulation controls.
+  - Implemented `AdminNavController` coordinating 5 workspaces (`studio`, `batch`, `analytics`, `audit`, `settings`).
+  - Implemented `BatchController` supporting CSV/JSON parsing, preset loaders, batch QR generation, scannability scoring, and pure-Dart PKZIP archive exporter with SHA-256 fingerprinting.
+  - Implemented `AnalyticsController` connecting to `AdminAnalyticsFacade` with time-series charts, 15-format distribution breakdowns, threat histograms, top malicious domains, and canonical report exporters.
+  - Implemented `RbacGuardView` with cyber access denial screen and token authentication dialog.
+  - Implemented `AdminShellView` with `AdaptiveWorkspaceShell` for wide and compact form factors.
+  - Implemented `BatchGeneratorView`, `AnalyticsDashboardView`, `AuditTrailView`, and `AdminSettingsView`.
+  - Quality Gates: Achieved **96.77% line coverage** (2,308 / 2,385 lines hit), 79/79 tests passing (100%), 0 static analyzer issues across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`), 100% compile-time binary isolation confirmed. Automated gate script `scripts/verify_subphase_5_2_2.ps1`.
+- **[2026-11-22T13:40:00+05:30] [START] Subphase 6.1.1**: Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets).
+  - Configure native platform runner directories (`android`, `ios`, `windows`, `linux`, `macos`) for both `apps/user_app` and `apps/admin_app` with distinct application IDs (`com.universalqr.user` vs `com.universalqr.admin`), app names, permissions (camera, storage/photos), window sizing constraints, and desktop branding.
+  - Implement standalone packaging scripts `scripts/package_artifact.ps1` and `scripts/package_artifact.sh` to assemble standalone, non-nested downloadable archives (zip/tar.gz) with embedded `INSTALL.md`, `BUILD_METADATA.json`, and `.sha256` checksum manifests.
+  - Implement automated verification test script `scripts/verify_subphase_6_1_1.ps1` checking runner configs, IDs, permissions, and packaging scripts execution.
+  - Target: 100% passing tests, 0 static analyzer issues, and valid multi-platform runner configs.
