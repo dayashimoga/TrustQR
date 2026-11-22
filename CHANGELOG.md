@@ -4,6 +4,44 @@
 
 ---
 
+## [0.1.0-subphase.6.1.1] - 2026-11-22
+
+### Added
+- **Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Re-verified that `apps/user_app` remains 100% physically and compile-time isolated from `packages/qr_generator_engine` and `packages/qr_admin_analytics`. Binary isolation audit script passed with 0 violations.
+  - **Native Platform Runner Configurations (`apps/user_app` & `apps/admin_app`)**:
+    - Configured native runner directories across all 5 operating systems: Android, iOS, Windows, Linux, and macOS.
+    - **Distinct Application Identifiers**:
+      - User App: Android `applicationId = "com.universalqr.user"`, iOS `PRODUCT_BUNDLE_IDENTIFIER = com.universalqr.user;`, macOS `PRODUCT_BUNDLE_IDENTIFIER = com.universalqr.user`, Linux `set(APPLICATION_ID "com.universalqr.user")`.
+      - Admin App: Android `applicationId = "com.universalqr.admin"`, iOS `PRODUCT_BUNDLE_IDENTIFIER = com.universalqr.admin;`, macOS `PRODUCT_BUNDLE_IDENTIFIER = com.universalqr.admin`, Linux `set(APPLICATION_ID "com.universalqr.admin")`.
+    - **Display Names & Window Branding**:
+      - User App: Display name "Universal QR Scanner" across Android manifest, iOS Info.plist, macOS Info.plist/AppInfo, Windows main.cpp/Runner.rc, and Linux GTK header bar / title.
+      - Admin App: Display name "Universal QR Admin" across Android manifest, iOS Info.plist, macOS Info.plist/AppInfo, Windows main.cpp/Runner.rc, and Linux GTK header bar / title.
+    - **Permissions & Sandboxed Entitlements**:
+      - Android: `CAMERA`, `READ_EXTERNAL_STORAGE`, `READ_MEDIA_IMAGES`, `INTERNET`, plus `WRITE_EXTERNAL_STORAGE` on Admin App for export pipelines.
+      - iOS: `NSCameraUsageDescription` and `NSPhotoLibraryUsageDescription` strings for camera and screenshot inspection.
+      - macOS: `NSCameraUsageDescription` in Info.plist; sandboxed runtime entitlements (`com.apple.security.device.camera`, `com.apple.security.network.client`, `com.apple.security.files.user-selected.read-write`) in `Release.entitlements` and `DebugProfile.entitlements`.
+    - **Window Sizing Constraints**:
+      - User App: Default 1200x750 desktop layout on Windows and Linux.
+      - Admin App: Default 1280x850 desktop layout on Windows and Linux for multi-pane studio & analytics workspaces.
+  - **Standalone Non-Nested Artifact Packaging Pipeline (`scripts/package_artifact.ps1`, `scripts/package_artifact.sh`)**:
+    - Assembles standalone, non-nested downloadable archives (ZIP for Windows/Android/iOS; TAR.GZ for Linux/macOS) with direct root-level payload extraction.
+    - Automatically embeds customized `INSTALL.md` with OS-specific installation, permissions, and launch steps.
+    - Automatically embeds `BUILD_METADATA.json` capturing commit SHA, UTC build timestamp, application ID, target platform, build mode, security role scope, and packaging schema.
+    - Generates standalone `<archive>.sha256` checksum manifests for release integrity verification.
+    - Supports selective or full matrix packaging (`-TargetApp all|user_app|admin_app`, `-TargetPlatform all|windows|linux|macos|android|ios`, `-BuildMode release|debug|profile`).
+  - **Automated Verification Harness (`scripts/verify_native_runner_configs.dart`, `scripts/verify_subphase_6_1_1.ps1`)**:
+    - Created `scripts/verify_native_runner_configs.dart` with 47 automated rules covering existence, bundle IDs, app labels, permissions, and sandboxed entitlements across all 5 platforms.
+    - Created `scripts/verify_subphase_6_1_1.ps1` orchestrating 5 strict verification gates:
+      - Gate 1: Compile-Time Binary Isolation Audit (PASS).
+      - Gate 2: Native Runner Configuration Auditor (47/47 rules pass).
+      - Gate 3: Monorepo Static Analysis (0 errors, 0 warnings, 0 infos).
+      - Gate 4: Standalone Packaging Pipeline Test (10/10 archives & SHA-256 manifests verified).
+      - Gate 5: Regression Test Suites (100% pass rate: 132/132 tests in user_app & admin_app).
+
+---
+
 ## [0.1.0-subphase.5.2.2] - 2026-11-22
 
 ### Added
