@@ -12,7 +12,7 @@
 - [x] **Subphase 1.2.2**: Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens
 - [x] **Subphase 2.1.1**: Zero-Trust QR Threat Firewall & Anti-Phishing Inspection Engine
 - [x] **Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite
-- [ ] **Subphase 2.2.1**: Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search)
+- [x] **Subphase 2.2.1**: Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search)
 - [ ] **Subphase 2.2.2**: Server-Side RBAC & Entitlement Service (`services/rbac_api`) + Penetration Tests
 - [ ] **Subphase 3.1.1**: Universal QR Decoding Pipeline (Camera, Image, File, Multi-QR Batch Matrix Vision)
 - [ ] **Subphase 3.1.2**: Integrated Scan-to-Firewall-to-Vault Pipeline & Decoding Performance Benchmarks
@@ -47,3 +47,5 @@
 - **[2026-11-22T09:26:00+05:30] [VERIFIED] Subphase 2.1.1**: Completed QrThreatFirewall with IDN homograph checks, scheme blocking, IP obfuscation, URL shortener detection, Wi-Fi vulnerability checks, TrustQR verification, and 0-100 safety score. 96.13% line coverage (149/155 lines hit, 16/16 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.1.2.
 - **[2026-11-22T09:30:00+05:30] [START] Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite (100+ attack/benign vector corpus, zero false-negative validation, latency benchmarking, and >=95% test coverage).
 - **[2026-11-22T09:44:00+05:30] [VERIFIED] Subphase 2.1.2**: Completed 150-vector adversarial corpus across 12 attack/benign categories, verified 0 false negatives, measured 0.0133 ms average heuristic latency (75,321 payloads/sec), and achieved 100.00% line coverage (220/220 lines hit, 32/32 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.2.1.
+- **[2026-11-22T09:48:00+05:30] [START] Subphase 2.2.1**: Offline-First Encrypted Vault in packages/qr_core (History, Favorites, Collections, Tags, FTS search, HMAC integrity guard, auto-purge, and JSON import/export).
+- **[2026-11-22T10:03:00+05:30] [VERIFIED] Subphase 2.2.1**: Completed QrVault engine with in-memory and durable atomic file-json adapters, multi-criteria filtering, FTS search, collection management, tag aggregation, privacy auto-purge retention policies, JSON import/export, and HMAC-SHA256 record tamper detection. Achieved 97.83% line coverage (1530/1564 lines hit, 64/64 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.2.2.

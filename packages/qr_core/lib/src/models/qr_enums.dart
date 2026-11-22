@@ -64,3 +64,18 @@ enum CryptoCurrency {
   litecoin,
   other,
 }
+
+/// Origin of a stored QR code item in the vault.
+enum QrItemOrigin {
+  scanned,
+  generated,
+}
+
+/// Sorting criteria for querying the vault.
+enum QrVaultSortBy {
+  createdAtDesc,
+  createdAtAsc,
+  titleAsc,
+  safetyScoreAsc,
+  safetyScoreDesc,
+}

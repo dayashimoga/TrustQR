@@ -4,6 +4,29 @@
 
 ---
 
+## [0.1.0-subphase.2.2.1] - 2026-11-22
+
+### Added
+- **Offline-First Vault Engine** (`packages/qr_core/lib/src/vault/qr_vault.dart`):
+  - **CRUD Operations**: Record items, update notes/titles, assign/unassign collections, tag items, toggle favorites, and paginate with offset/limit.
+  - **Cryptographic HMAC Integrity Guard**: Every stored record is signed with HMAC-SHA256 over its canonical data representation. The vault continuously audits stored records and flags external database or file tampering.
+  - **Multi-Criteria Filter Engine (`QrVaultFilter`)**: Query by item origin (`scanned` vs `generated`), favorite flag, collection ID, multiple payload types, security threat levels, tags, and date ranges.
+  - **Full-Text Search (FTS)**: Multi-word token matching across titles, raw payloads, notes, TrustQR issuers, and tag labels with case-insensitive matching.
+  - **Collections Management (`QrCollection`)**: Dynamic collection folders with computed item counts and options to unlink vs cascading delete contained items.
+  - **Tag Aggregation**: Multi-tag management, global tag listing, and tag frequency count aggregation.
+  - **Privacy Auto-Purge Retention (`VaultPrivacyPolicy`)**: Automatic deletion of historical scanned items older than N days (configurable 30/60/90 days), with automatic exemption for favorited items.
+  - **Incognito Mode**: Temporary scan evaluation that bypasses durable disk storage completely.
+  - **JSON Export & Import Pipeline**: Formatted JSON export with schema metadata and robust import validation handling duplicates and verifying integrity signatures.
+  - **Storage Persistence Adapters**:
+    - `InMemoryVaultStorageAdapter`: Ultra-fast memory cache for ephemeral test suites and incognito sessions.
+    - `FileJsonVaultStorageAdapter`: Cross-platform durable file persistence with atomic temp-file write-and-rename semantics preventing data corruption.
+- **Automated Test Suite & Verification**:
+  - Authored comprehensive test suite in `packages/qr_core/test/vault_test.dart` (64 total tests in `qr_core` passing 100%).
+  - Achieved **97.83% line coverage** (1530 / 1564 lines hit) across `packages/qr_core`.
+  - Added `scripts/verify_subphase_2_2_1.ps1` verifying binary isolation, 0 analyzer issues, test suite, and coverage.
+
+---
+
 ## [0.1.0-subphase.2.1.2] - 2026-11-22
 
 ### Added
