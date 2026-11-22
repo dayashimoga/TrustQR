@@ -4,6 +4,27 @@
 
 ---
 
+## [0.1.0-subphase.1.2.2] - 2026-11-22
+
+### Added
+- **Pure-Dart Ed25519 (RFC 8032) Cryptographic Engine** (`packages/qr_core/lib/src/crypto/ed25519_engine.dart`):
+  - Curve25519 Edwards point arithmetic modulo $2^{255}-19$, scalar multiplication, point compression/decompression, and SHA-512 based signing and verification.
+  - Zero external native C/C++ dependencies; 100% portable across Android, iOS, Windows, Linux, and macOS.
+- **HMAC-SHA256 Cryptographic Engine** (`packages/qr_core/lib/src/crypto/hmac_engine.dart`):
+  - Constant-time signature verification for symmetric cryptographic tokens.
+- **TrustQR Institutional Envelope Protocol** (`packages/qr_core/lib/src/crypto/trust_qr_envelope.dart`):
+  - Canonical envelope signing and verification preventing physical QR sticker overlay tampering.
+  - URI format: `trustqr://v1?issuer=...&payload=...&created=...&keyId=...&alg=...&sig=...`.
+  - Expiration enforcement, key ID mismatch detection, and tamper detection down to single-byte modifications.
+- **Asymmetric Entitlement Token Engine** (`packages/qr_core/lib/src/crypto/entitlement_token.dart`):
+  - Compact 3-part token issuance (`<header>.<claims>.<signature>`) and verification.
+  - Server-side cryptographic role enforcement (`admin` vs `user`), scope hierarchy, expiration enforcement, and local tampering rejection.
+- **Automated Cryptographic Test Suite**:
+  - Added `packages/qr_core/test/crypto_test.dart` covering key generation, 1-bit tamper detection, length guards, expiration checks, and adversarial token manipulation.
+  - Line coverage: **98.37%** (1029 / 1046 lines hit), exceeding the mandatory `>= 95%` quality gate.
+
+---
+
 ## [0.1.0-subphase.1.2.1] - 2026-11-22
 
 ### Added

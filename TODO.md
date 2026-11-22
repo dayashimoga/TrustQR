@@ -9,7 +9,7 @@
 - [x] **Subphase 1.1.1**: Antigravity Multi-Agent Framework, Global Engineering Contract & Master Roadmap
 - [x] **Subphase 1.1.2**: Monorepo Scaffolding (`packages/*`, `services/*`, `apps/*`) & Binary Isolation Auditor
 - [x] **Subphase 1.2.1**: Multi-Format QR Payload Engine (15+ Formats), Parsers, Encoders & Schema Validators
-- [ ] **Subphase 1.2.2**: Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens
+- [x] **Subphase 1.2.2**: Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens
 - [ ] **Subphase 2.1.1**: Zero-Trust QR Threat Firewall & Anti-Phishing Inspection Engine
 - [ ] **Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite
 - [ ] **Subphase 2.2.1**: Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search)
@@ -41,3 +41,5 @@
 - **[2026-11-22T08:30:00+05:30] [VERIFIED] Subphase 1.1.2**: Monorepo scaffolding complete across 8 packages, services, and applications. Binary isolation auditor verified with self-test. 100% passing tests (23/23 tests, 0 analyzer issues). Ready for user confirmation for Subphase 1.2.1.
 - **[2026-11-22T08:35:00+05:30] [START] Subphase 1.2.1**: Multi-format QR payload engine, 15 format parsers, encoders, and schema validators in packages/qr_core.
 - **[2026-11-22T08:48:00+05:30] [VERIFIED] Subphase 1.2.1**: Completed 15 structured QR payload models, schema validators, and universal parser in packages/qr_core. Verified 99.27% line coverage (684/689 lines hit, 26/26 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 1.2.2.
+- **[2026-11-22T08:50:00+05:30] [START] Subphase 1.2.2**: Ed25519 TrustQR cryptographic signing, asymmetric entitlement tokens, and verification suite in packages/qr_core.
+- **[2026-11-22T09:04:00+05:30] [VERIFIED] Subphase 1.2.2**: Pure-Dart Ed25519 & HMAC engines, TrustQR envelopes, and asymmetric entitlement tokens complete. 98.37% line coverage (1029/1046 lines hit, 43/43 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.1.1.

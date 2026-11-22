@@ -6,6 +6,9 @@ publish_to: none
 environment:
   sdk: '>=3.0.0 <4.0.0'
 
+dependencies:
+  crypto: ^3.0.3
+
 dev_dependencies:
   test: ^1.24.0
   lints: ^2.1.0

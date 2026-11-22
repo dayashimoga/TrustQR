@@ -11,8 +11,8 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 3 / 24 (`12.5%`)
-- **Current Active Subphase**: `1.2.1` (`VERIFIED` — Awaiting User Confirmation for `1.2.2`)
+- **Verified Subphases**: 4 / 24 (`16.67%`)
+- **Current Active Subphase**: `1.2.2` (`VERIFIED` — Awaiting User Confirmation for `2.1.1`)
 - **Blocked Subphases**: 0
 
 ---
@@ -24,7 +24,7 @@
 | **1.1.1** | S1 / P1.1 | Antigravity Multi-Agent Framework, Global Engineering Contract & Master Roadmap | 25 min | 10 min | `VERIFIED` | 100% (18/18 governance & structure checks) | `AGENTS.md`, `.agents/skills/*`, `docs/ROADMAP.md`, `scripts/verify_subphase_1_1_1.ps1` |
 | **1.1.2** | S1 / P1.1 | Monorepo Scaffolding (`packages/*`, `services/*`, `apps/*`) & Binary Isolation Auditor | 25 min | 12 min | `VERIFIED` | 100% (23/23 tests pass across 8 packages/apps, 0 analyzer issues) | `scripts/verify_binary_isolation.dart`, `scripts/run_monorepo_checks.ps1`, 8 package scaffoldings |
 | **1.2.1** | S1 / P1.2 | Multi-Format QR Payload Engine (15+ Formats), Parsers, Encoders & Schema Validators | 35 min | 15 min | `VERIFIED` | 99.27% line coverage (684/689 lines hit, 26/26 tests pass, 0 analyzer issues) | `packages/qr_core/lib/src/*`, `packages/qr_core/test/*`, `scripts/verify_qr_core_coverage.ps1` |
-| **1.2.2** | S1 / P1.2 | Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **1.2.2** | S1 / P1.2 | Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens | 35 min | 14 min | `VERIFIED` | 98.37% line coverage (1029/1046 lines hit, 43/43 tests pass, 0 analyzer issues) | `packages/qr_core/lib/src/crypto/*`, `packages/qr_core/test/crypto_test.dart` |
 | **2.1.1** | S2 / P2.1 | Zero-Trust QR Threat Firewall & Anti-Phishing Inspection Engine | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **2.1.2** | S2 / P2.1 | Threat Firewall Adversarial Benchmark & Security Verification Suite | 25 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **2.2.1** | S2 / P2.2 | Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search) | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
