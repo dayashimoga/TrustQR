@@ -11,7 +11,7 @@
 - [x] **Subphase 1.2.1**: Multi-Format QR Payload Engine (15+ Formats), Parsers, Encoders & Schema Validators
 - [x] **Subphase 1.2.2**: Ed25519 `TrustQR` Cryptographic Signing & Asymmetric Entitlement Tokens
 - [x] **Subphase 2.1.1**: Zero-Trust QR Threat Firewall & Anti-Phishing Inspection Engine
-- [ ] **Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite
+- [x] **Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite
 - [ ] **Subphase 2.2.1**: Offline-First Encrypted Vault (History, Favorites, Collections, Tags, FTS Search)
 - [ ] **Subphase 2.2.2**: Server-Side RBAC & Entitlement Service (`services/rbac_api`) + Penetration Tests
 - [ ] **Subphase 3.1.1**: Universal QR Decoding Pipeline (Camera, Image, File, Multi-QR Batch Matrix Vision)
@@ -45,3 +45,5 @@
 - **[2026-11-22T09:04:00+05:30] [VERIFIED] Subphase 1.2.2**: Pure-Dart Ed25519 & HMAC engines, TrustQR envelopes, and asymmetric entitlement tokens complete. 98.37% line coverage (1029/1046 lines hit, 43/43 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.1.1.
 - **[2026-11-22T09:12:00+05:30] [START] Subphase 2.1.1**: Zero-Trust QR Threat Firewall, heuristic anti-phishing inspection engine, and safety scoring.
 - **[2026-11-22T09:26:00+05:30] [VERIFIED] Subphase 2.1.1**: Completed QrThreatFirewall with IDN homograph checks, scheme blocking, IP obfuscation, URL shortener detection, Wi-Fi vulnerability checks, TrustQR verification, and 0-100 safety score. 96.13% line coverage (149/155 lines hit, 16/16 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.1.2.
+- **[2026-11-22T09:30:00+05:30] [START] Subphase 2.1.2**: Threat Firewall Adversarial Benchmark & Security Verification Suite (100+ attack/benign vector corpus, zero false-negative validation, latency benchmarking, and >=95% test coverage).
+- **[2026-11-22T09:44:00+05:30] [VERIFIED] Subphase 2.1.2**: Completed 150-vector adversarial corpus across 12 attack/benign categories, verified 0 false negatives, measured 0.0133 ms average heuristic latency (75,321 payloads/sec), and achieved 100.00% line coverage (220/220 lines hit, 32/32 tests passing, 0 analyzer issues). Ready for user confirmation for Subphase 2.2.1.

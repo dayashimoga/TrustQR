@@ -169,5 +169,32 @@ END:VCARD''';
       expect(malformedRes.isCritical, isTrue);
       expect(malformedRes.findings.first.code, equals('TF_TRUSTQR_MALFORMED'));
     });
+
+    test('ThreatAssessment and ThreatFinding serialization toJson', () {
+      const finding = ThreatFinding(
+        code: 'TEST_CODE',
+        severity: SecurityThreatLevel.caution,
+        title: 'Test Title',
+        description: 'Test Desc',
+        remediationRecommendation: 'Test Rec',
+      );
+      final json = finding.toJson();
+      expect(json['code'], equals('TEST_CODE'));
+      expect(json['severity'], equals('caution'));
+      expect(json['title'], equals('Test Title'));
+      expect(json['description'], equals('Test Desc'));
+      expect(json['remediationRecommendation'], equals('Test Rec'));
+
+      const assessment = ThreatAssessment(
+        safetyScore: 85,
+        threatLevel: SecurityThreatLevel.caution,
+        findings: [finding],
+        isActionAllowed: true,
+        summary: 'Test summary',
+      );
+      final assessmentJson = assessment.toJson();
+      expect(assessmentJson['safetyScore'], equals(85));
+      expect((assessmentJson['findings'] as List).length, equals(1));
+    });
   });
 }

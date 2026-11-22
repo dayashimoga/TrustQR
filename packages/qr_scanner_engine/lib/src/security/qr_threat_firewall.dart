@@ -46,6 +46,23 @@ class QrThreatFirewall {
     'admin',
   };
 
+  static const Set<String> _openRedirectParamKeys = {
+    'redirect',
+    'redirect_url',
+    'redirect_uri',
+    'return_url',
+    'return_uri',
+    'url',
+    'dest',
+    'destination',
+    'next',
+    'target',
+    'goto',
+    'out',
+    'continue',
+    'r',
+  };
+
   // Common Cyrillic and Greek lookalikes mixed with Latin letters in homograph attacks
   static final RegExp _confusableUnicode = RegExp(
     r'[\u0430\u0441\u0435\u043E\u0440\u0445\u0443\u0456\u0458\u03BF\u03B1\u03C1\u03BD]',
@@ -79,9 +96,10 @@ class QrThreatFirewall {
     }
 
     // 2. Dangerous Scheme Blocking
-    final colonIdx = trimmed.indexOf(':');
+    final sanitizedScheme = trimmed.replaceAll(RegExp(r'[\x00-\x1F\s]'), '');
+    final colonIdx = sanitizedScheme.indexOf(':');
     if (colonIdx != -1) {
-      final scheme = trimmed.substring(0, colonIdx).toLowerCase();
+      final scheme = sanitizedScheme.substring(0, colonIdx).toLowerCase();
       if (_dangerousSchemes.contains(scheme)) {
         findings.add(const ThreatFinding(
           code: 'TF_SCHEME_DANGEROUS',
@@ -103,13 +121,21 @@ class QrThreatFirewall {
     // Parse into structured payload
     final payload = QrPayloadParser.parse(trimmed);
 
-    // 3. URL-specific inspection
+    // 3. Format-specific security inspection
     if (payload is UrlPayload) {
       score = _inspectUrl(payload, findings, score);
     } else if (payload is WifiPayload) {
       score = _inspectWifi(payload, findings, score);
     } else if (payload is VCardPayload) {
       score = _inspectVCard(payload, findings, score);
+    } else if (payload is MeCardPayload) {
+      score = _inspectMeCard(payload, findings, score);
+    } else if (payload is SmsPayload) {
+      score = _inspectSms(payload, findings, score);
+    } else if (payload is TelPayload) {
+      score = _inspectTel(payload, findings, score);
+    } else if (payload is PlainTextPayload) {
+      score = _inspectPlainText(payload, findings, score);
     }
 
     score = score.clamp(0, 100);
@@ -249,12 +275,63 @@ class QrThreatFirewall {
       }
     }
 
+    // 3g. Query script injection / reflected XSS check
+    for (final entry in uri.queryParameters.entries) {
+      final val = entry.value.toLowerCase();
+      if (val.contains('javascript:') ||
+          val.contains('vbscript:') ||
+          val.contains('<script') ||
+          val.contains('data:text/html') ||
+          val.contains('onerror=') ||
+          val.contains('onload=')) {
+        findings.add(ThreatFinding(
+          code: 'TF_QUERY_SCRIPT_INJECTION',
+          severity: SecurityThreatLevel.critical,
+          title: 'Script Injection / Reflected XSS Parameter',
+          description: 'Query parameter "${entry.key}" contains injected script execution code ($val).',
+          remediationRecommendation: 'Do not follow this link. It attempts cross-site scripting (XSS).',
+        ));
+        score -= 75;
+        break;
+      }
+    }
+
+    // 3h. Open-Redirect parameter check
+    for (final entry in uri.queryParameters.entries) {
+      final key = entry.key.toLowerCase();
+      final val = entry.value.trim().toLowerCase();
+      if (_openRedirectParamKeys.contains(key)) {
+        if (val.startsWith('http://') || val.startsWith('https://') || val.startsWith('//')) {
+          findings.add(ThreatFinding(
+            code: 'TF_OPEN_REDIRECT',
+            severity: SecurityThreatLevel.suspicious,
+            title: 'Potential Open-Redirect Trap',
+            description: 'URL contains open-redirect parameter "$key=$val", which can covertly redirect to malicious phishing domains.',
+            remediationRecommendation: 'Verify the destination target before proceeding.',
+          ));
+          score -= 30;
+          break;
+        }
+      }
+    }
+
     return score;
   }
 
   int _inspectWifi(WifiPayload wifiPayload, List<ThreatFinding> findings, int currentScore) {
     var score = currentScore;
-    if (wifiPayload.authType == WifiAuthType.none) {
+    if (wifiPayload.ssid.trim().isEmpty) {
+      findings.add(const ThreatFinding(
+        code: 'TF_WIFI_EMPTY_SSID',
+        severity: SecurityThreatLevel.caution,
+        title: 'Empty Network SSID',
+        description: 'Wi-Fi configuration has an empty network identifier.',
+        remediationRecommendation: 'Verify network identity before attempting connection.',
+      ));
+      score -= 20;
+    }
+    if (wifiPayload.authType == WifiAuthType.none ||
+        (wifiPayload.password.isEmpty && wifiPayload.authType != WifiAuthType.wep)) {
       findings.add(const ThreatFinding(
         code: 'TF_WIFI_UNENCRYPTED',
         severity: SecurityThreatLevel.caution,
@@ -290,6 +367,75 @@ class QrThreatFirewall {
         ));
         score -= 15;
       }
+    }
+    return score;
+  }
+
+  int _inspectMeCard(MeCardPayload mecard, List<ThreatFinding> findings, int currentScore) {
+    var score = currentScore;
+    if (mecard.url != null) {
+      final uri = Uri.tryParse(mecard.url!);
+      if (uri != null && uri.scheme == 'http') {
+        findings.add(ThreatFinding(
+          code: 'TF_MECARD_INSECURE_URL',
+          severity: SecurityThreatLevel.caution,
+          title: 'MeCard Contains Unencrypted Website URL',
+          description: 'Contact website (${mecard.url}) uses unencrypted HTTP.',
+          remediationRecommendation: 'Verify contact details independently.',
+        ));
+        score -= 15;
+      }
+    }
+    return score;
+  }
+
+  int _inspectSms(SmsPayload sms, List<ThreatFinding> findings, int currentScore) {
+    var score = currentScore;
+    final combined = '${sms.phoneNumber} ${sms.message ?? ''}'.toLowerCase();
+    if (combined.contains('\r') || combined.contains('\n') || combined.contains('%0d') || combined.contains('%0a')) {
+      findings.add(const ThreatFinding(
+        code: 'TF_CRLF_INJECTION',
+        severity: SecurityThreatLevel.suspicious,
+        title: 'CRLF Injection in SMS Payload',
+        description: 'SMS contains newline injection characters (%0d%0a) capable of protocol header splitting.',
+        remediationRecommendation: 'Do not send SMS with unverified carriage return or newline characters.',
+      ));
+      score -= 40;
+    }
+    return score;
+  }
+
+  int _inspectTel(TelPayload tel, List<ThreatFinding> findings, int currentScore) {
+    var score = currentScore;
+    final number = tel.phoneNumber.toLowerCase();
+    if (number.contains('\r') || number.contains('\n') || number.contains('%0d') || number.contains('%0a') || number.contains(';')) {
+      findings.add(const ThreatFinding(
+        code: 'TF_TEL_CONTROL_INJECTION',
+        severity: SecurityThreatLevel.suspicious,
+        title: 'Control Character Injection in Telephone URI',
+        description: 'Telephone number contains DTMF pauses, semicolons, or newline injection characters.',
+        remediationRecommendation: 'Verify destination phone number.',
+      ));
+      score -= 30;
+    }
+    return score;
+  }
+
+  int _inspectPlainText(PlainTextPayload text, List<ThreatFinding> findings, int currentScore) {
+    var score = currentScore;
+    final lower = text.text.toLowerCase();
+    if (lower.contains('<script') ||
+        lower.contains('javascript:') ||
+        lower.contains('powershell.exe') ||
+        lower.contains('cmd.exe /c')) {
+      findings.add(const ThreatFinding(
+        code: 'TF_TEXT_SCRIPT_EMBEDDED',
+        severity: SecurityThreatLevel.suspicious,
+        title: 'Embedded Script / Shell Command in Text',
+        description: 'Plain text payload contains embedded HTML script tags or shell invocation commands.',
+        remediationRecommendation: 'Treat embedded text as unverified data and do not pipe to shell.',
+      ));
+      score -= 40;
     }
     return score;
   }
@@ -375,14 +521,25 @@ class QrThreatFirewall {
     if (RegExp(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$').hasMatch(host)) return true;
     if (host.startsWith('0x') || host.contains('.0x')) return true;
     if (RegExp(r'^\d{8,11}$').hasMatch(host)) return true; // Dword IP
-    if (host.startsWith('[') && host.endsWith(']')) return true; // IPv6
+    if (host.contains(':')) return true; // IPv6 contains colons
+    if (host.startsWith('[') && host.endsWith(']')) return true; // IPv6 with brackets
     return false;
   }
 
   static bool _isPrivateIp(String host) {
-    if (host == 'localhost' || host == '127.0.0.1' || host == '[::1]') return true;
+    if (host == 'localhost' || host == '::1' || host == '[::1]') return true;
+    if (host.startsWith('127.')) return true; // IPv4 Loopback (127.0.0.0/8)
     if (host.startsWith('10.') || host.startsWith('192.168.') || host.startsWith('169.254.')) return true;
     if (RegExp(r'^172\.(1[6-9]|2[0-9]|3[0-1])\.').hasMatch(host)) return true;
+    // IPv6 Unique Local and Link-Local addresses
+    if (host.startsWith('fe80:') ||
+        host.startsWith('[fe80:') ||
+        host.startsWith('fc') ||
+        host.startsWith('[fc') ||
+        host.startsWith('fd') ||
+        host.startsWith('[fd')) {
+      return true;
+    }
     return false;
   }
 
