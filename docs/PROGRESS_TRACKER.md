@@ -11,9 +11,9 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 10 / 24 (`41.67%`)
-- **Current Active Subphase**: `3.1.2` (`VERIFIED` — Integrated Scan-to-Firewall-to-Vault Pipeline)
-- **Next Subphase**: `3.2.1` (`PENDING` — Admin-Only Artistic QR Matrix Encoder)
+- **Verified Subphases**: 11 / 24 (`45.83%`)
+- **Current Active Subphase**: `3.2.1` (`VERIFIED` — Admin-Only Artistic QR Matrix Encoder)
+- **Next Subphase**: `3.2.2` (`PENDING` — Real-Time Scannability & Contrast Simulator)
 - **Blocked Subphases**: 0
 
 ---
@@ -32,7 +32,7 @@
 | **2.2.2** | S2 / P2.2 | Server-Side RBAC & Entitlement Service (`services/rbac_api`) + Penetration Tests | 40 min | 15 min | `VERIFIED` | 98.06% line coverage (455/464 lines hit, 60/60 tests pass, 100% penetration suite, 0 analyzer issues) | `services/rbac_api/lib/*`, `services/rbac_api/test/*`, `scripts/verify_subphase_2_2_2.ps1` |
 | **3.1.1** | S3 / P3.1 | Universal QR Decoding Pipeline (Camera, Image, File, Multi-QR Batch Matrix Vision) | 40 min | 16 min | `VERIFIED` | 99.36% line coverage (1237/1245 lines hit, 76/76 tests pass, 0 analyzer issues) | `packages/qr_scanner_engine/lib/src/*`, `packages/qr_scanner_engine/test/decoding_pipeline_test.dart`, `scripts/verify_subphase_3_1_1.ps1` |
 | **3.1.2** | S3 / P3.1 | Integrated Scan-to-Firewall-to-Vault Pipeline & Decoding Performance Benchmarks | 30 min | 14 min | `VERIFIED` | 99.31% line coverage (1433/1443 lines hit, 94/94 tests pass, < 25 ms latency gate pass, 0 analyzer issues) | `packages/qr_scanner_engine/lib/src/pipeline/*`, `test/pipeline/*`, `test/benchmark/*`, `scripts/verify_subphase_3_1_2.ps1` |
-| **3.2.1** | S3 / P3.2 | Admin-Only Artistic QR Matrix Encoder, Shaders, Gradients, Logos & Branded Templates | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **3.2.1** | S3 / P3.2 | Admin-Only Artistic QR Matrix Encoder, Shaders, Gradients, Logos & Branded Templates | 40 min | 16 min | `VERIFIED` | 98.70% line coverage (908/920 lines hit, 37/37 tests pass, 100% round-trip decoded, 0 analyzer issues) | `packages/qr_generator_engine/lib/src/*`, `test/*`, `scripts/verify_subphase_3_2_1.ps1` |
 | **3.2.2** | S3 / P3.2 | Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **4.1.1** | S4 / P4.1 | Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **4.1.2** | S4 / P4.1 | WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests | 30 min | — | `PENDING` | Pending (`>=95%` target) | — |

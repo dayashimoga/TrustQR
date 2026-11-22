@@ -213,7 +213,8 @@ class AdaptiveBinarizer {
           }
         }
 
-        final threshold = threshCount > 0 ? (threshSum ~/ threshCount) : 128;
+        var threshold = threshCount > 0 ? (threshSum ~/ threshCount) : 128;
+        if (threshold < 85) threshold = 85;
         final pixelLum = luminance[rowOffset + x];
         // In QR code, black module = true (pixel is darker than threshold)
         matrix.set(x, y, pixelLum < threshold);

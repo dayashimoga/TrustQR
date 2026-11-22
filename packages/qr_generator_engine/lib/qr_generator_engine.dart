@@ -1,6 +1,20 @@
 /// Admin-only QR matrix generator, styling, and scannability simulator engine.
 library qr_generator_engine;
 
+import 'src/engine/artistic_qr_generator_engine.dart';
+
+export 'src/matrix/qr_matrix.dart';
+export 'src/encoder/qr_polynomial.dart';
+export 'src/encoder/qr_version.dart';
+export 'src/encoder/qr_encoder.dart';
+export 'src/style/qr_eye_style.dart';
+export 'src/style/qr_color_config.dart';
+export 'src/style/qr_logo_config.dart';
+export 'src/style/qr_template.dart';
+export 'src/rasterizer/qr_generated_image.dart';
+export 'src/rasterizer/qr_matrix_rasterizer.dart';
+export 'src/engine/artistic_qr_generator_engine.dart';
+
 /// Supported artistic module shapes.
 enum QrModuleShape {
   square,
@@ -59,50 +73,10 @@ abstract class QrGeneratorEngine {
   String generateMatrixRepresentation(String payload, QrCustomizationOptions options);
 }
 
-/// Default implementation of [QrGeneratorEngine].
-class DefaultQrGeneratorEngine implements QrGeneratorEngine {
-  const DefaultQrGeneratorEngine();
-
-  @override
-  ScannabilityAssessment evaluateScannability(QrCustomizationOptions options) {
-    // Basic Michelson / luminance ratio calculation
-    final fgLuminance = _luminance(options.foregroundColorHex);
-    final bgLuminance = _luminance(options.backgroundColorHex);
-    final ratio = (bgLuminance > fgLuminance)
-        ? (bgLuminance + 0.05) / (fgLuminance + 0.05)
-        : (fgLuminance + 0.05) / (bgLuminance + 0.05);
-
-    double score = 100.0;
-    if (ratio < 4.5) {
-      score -= (4.5 - ratio) * 20.0;
-    }
-    if (options.hasEmbeddedLogo) {
-      score -= options.logoOcclusionPercentage * 1.5;
-    }
-    score = score.clamp(0.0, 100.0);
-
-    final isScannable = score >= 50.0 && ratio >= 3.0;
-    final recommendation = isScannable
-        ? 'Optimal contrast and scannability.'
-        : 'Warning: Low contrast or excessive logo occlusion may prevent reliable scanning.';
-
-    return ScannabilityAssessment(
-      contrastRatio: ratio,
-      scannabilityScore: score,
-      isScannable: isScannable,
-      recommendation: recommendation,
-    );
-  }
-
-  @override
-  String generateMatrixRepresentation(String payload, QrCustomizationOptions options) {
-    return 'QR_MATRIX[len=${payload.length},shape=${options.moduleShape.name},ec=${options.errorCorrection.name}]';
-  }
-
-  double _luminance(int argb) {
-    final r = ((argb >> 16) & 0xFF) / 255.0;
-    final g = ((argb >> 8) & 0xFF) / 255.0;
-    final b = (argb & 0xFF) / 255.0;
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-  }
+/// Default implementation of [QrGeneratorEngine] backed by [ArtisticQrGeneratorEngine].
+class DefaultQrGeneratorEngine extends ArtisticQrGeneratorEngine {
+  const DefaultQrGeneratorEngine({
+    super.encoder,
+    super.rasterizer,
+  });
 }

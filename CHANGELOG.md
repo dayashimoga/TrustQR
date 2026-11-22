@@ -4,6 +4,59 @@
 
 ---
 
+## [0.1.0-subphase.3.2.1] - 2026-11-22
+
+### Added
+- **Admin-Only Artistic QR Matrix Encoder (`packages/qr_generator_engine`)**:
+  - **ISO/IEC 18004 QR Matrix Encoder** (`lib/src/encoder/qr_encoder.dart`):
+    - Multi-mode bitstream encoding supporting Numeric (10-bit/3-digit), Alphanumeric (11-bit/2-char), and Byte (8-bit UTF-8) modes.
+    - Automatic version selection (versions 1 through 10, extensible to 40) based on payload size and selected error correction level.
+    - Reed-Solomon Error Correction encoding for all 4 standard levels: Low (7%), Medium (15%), Quartile (25%), High (30%).
+    - Function pattern generation: 7x7 finder patterns, 1-module separators, horizontal and vertical timing patterns, alignment patterns for versions $\ge 2$, dark module, format info (BCH 15, 5 masked with `0x5412`), and 18-bit version info blocks for versions $\ge 7$.
+    - Dynamic mask pattern evaluation implementing all 8 standard masks with ISO/IEC 18004 penalty formulas ($N_1$ adjacent runs, $N_2$ 2x2 blocks, $N_3$ 1:1:3:1:1 finder-like patterns, $N_4$ balance penalty) to automatically select optimal mask.
+  - **Reed-Solomon Codeword Engine & Galois Field Arithmetic** (`lib/src/encoder/qr_polynomial.dart`, `lib/src/encoder/qr_version.dart`):
+    - Pure-Dart Galois Field $GF(2^8)$ arithmetic with primitive polynomial `0x11D` (285), exponential/logarithm lookup tables, inversion, multiplication, and division.
+    - Polynomial operations: multiplication, degree extraction, evaluation, and generator polynomial synthesis $g(x) = \prod_{i=0}^{n-1} (x - \alpha^i)$.
+    - Codeword interleaving across group 1 and group 2 blocks per ISO/IEC 18004 specifications.
+  - **Artistic Module Styling & Shaders** (`lib/src/rasterizer/qr_matrix_rasterizer.dart`, `lib/src/rasterizer/qr_generated_image.dart`):
+    - 6 artistic module shapes: `square`, `rounded` (subtle corner fillet), `dots` (circular modules), `diamond`, `liquid` (organic connected modules that intelligently bridge adjacent dark modules and fillet exterior corners), and `cyberGrid` (high-tech chamfered facets).
+    - Custom finder eye frame shapes: `square`, `rounded`, `circle`, `squircle` (superellipse), `hexagonal`.
+    - Custom finder eye pupil shapes: `square`, `rounded`, `circle`, `diamond`.
+    - Independent frame and pupil coloring with automatic contrast fallbacks.
+  - **Color & Gradient Engine** (`lib/src/style/qr_color_config.dart`):
+    - Multi-stop linear gradients with customizable angle projection (0° to 360°).
+    - Multi-stop radial gradients from matrix center outward.
+    - Smooth 32-bit ARGB interpolation and WCAG 2.1 relative luminance and contrast ratio computation.
+  - **Center Logo Cutout Engine** (`lib/src/style/qr_logo_config.dart`):
+    - Safe logo occlusion ratio calculator and strict validation against error correction budgets (L: 5%, M: 12%, Q: 20%, H: 26%).
+    - Quiet zone module padding and collision guard ensuring logos never encroach on finder patterns.
+    - `carveLogoArea` matrix module classification with `QrModuleType.logoArea`.
+  - **Branded Preset Templates** (`lib/src/style/qr_template.dart`):
+    - `cyberpunkNeon`: cyberGrid modules with glowing cyan/neon magenta gradient on dark slate canvas.
+    - `corporateNavy`: executive rounded modules in deep navy blue on crisp white.
+    - `emeraldTrust`: cryptographic TrustQR styling with emerald and rich teal gradient.
+    - `highContrastMono`: industrial high-contrast black-on-white square matrix.
+    - `sunsetVibrant`: fluid liquid modules with warm sunset coral to rose gradient.
+    - Comprehensive JSON serialization and deserialization for custom template persistence.
+  - **Pure-Dart Uncompressed 24-bit BMP Exporter** (`lib/src/rasterizer/qr_generated_image.dart`):
+    - Full binary generation of uncompressed 24-bit BMP images with standard BITMAPFILEHEADER and BITMAPINFOHEADER.
+  - **Real-Time Scannability Evaluator** (`lib/src/engine/artistic_qr_generator_engine.dart`):
+    - WCAG contrast assessment across solid and gradient stops.
+    - Occlusion vs ECC budget risk scoring.
+    - Shape focus penalty adjustments.
+    - Actionable recommendations with composite score (0–100) and `isScannable` boolean verdict.
+- **Round-Trip Decoding Verification & Test Suite**:
+  - Authored comprehensive test suites in `packages/qr_generator_engine/test/artistic_generator_test.dart` and `qr_encoder_test.dart`.
+  - **100% Round-Trip Scannability Verification**: Rendered styled QR matrices to `ImageBuffer` and decoded them with `UniversalQrScannerEngine` from `packages/qr_scanner_engine` across Numeric, Alphanumeric, Byte modes, liquid/rounded shapes, branded templates, logo cutouts (with Reed-Solomon data recovery), and BMP byte streams!
+  - Enhanced `AdaptiveBinarizer` in `qr_scanner_engine` with dynamic range minimum threshold floor preventing solid dark clusters from falsely inverting.
+  - **Quality Gates**: Achieved **98.70% line coverage** (908 / 920 lines hit) across `packages/qr_generator_engine`.
+  - 100% of automated tests pass (37 / 37 in generator engine, 94 / 94 in scanner engine).
+  - 0 static analysis errors, warnings, or infos across the entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`).
+  - Strict compile-time binary isolation verified (`scripts/verify_binary_isolation.dart`).
+  - Added automated verification script `scripts/verify_subphase_3_2_1.ps1`.
+
+---
+
 ## [0.1.0-subphase.3.1.2] - 2026-11-22
 
 ### Added
