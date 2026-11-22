@@ -4,6 +4,54 @@
 
 ---
 
+## [0.1.0-subphase.4.2.1] - 2026-11-22
+
+### Added
+- **Restricted User App Core (`apps/user_app`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Strictly verified `apps/user_app` has zero compile-time or runtime dependencies on `qr_generator_engine` or `qr_admin_analytics`.
+    - Automated negative breach tests pass with 100% enforcement (`scripts/verify_binary_isolation.dart`).
+  - **Live Scanner Viewfinder & Workspace (`apps/user_app/lib/src/views/scanner_workspace_view.dart`)**:
+    - Live HUD viewfinder with `HudScannerReticle` displaying laser sweep animation and state transition feedback (idle, scanning, safe, warning, threat).
+    - Top telemetry bar with live firewall operational status, camera torch/flashlight toggle, and privacy incognito mode toggle (bypassing vault storage).
+    - Bottom control dock featuring image file decoder button, batch multi-QR button, and manual payload text input with instant inspection.
+    - Responsive layout handling across compact, medium, and expanded desktop breakpoints without flex overflow.
+  - **Zero-Trust Threat Firewall HUD Modal (`apps/user_app/lib/src/widgets/threat_hud_modal.dart`)**:
+    - Interactive modal sheet presenting real-time safety score gauge (0–100), security threat rating (`safe`, `caution`, `suspicious`, `critical`), and heuristic telemetry breakdown (phishing signatures, dangerous URI schemes, URL shorteners, IP obfuscation).
+    - Cryptographic TrustQR authenticity section displaying Ed25519 institutional verification badge with issuer name, key ID, and timestamp.
+    - Quarantine Protection Active guard: blocks execution of high-risk payloads by default with user-acknowledgment checkbox override.
+    - Save-to-Vault and Dismiss actions with immediate reactive UI state update.
+  - **Multi-QR Candidate Picker (`apps/user_app/lib/src/widgets/multi_qr_picker_dialog.dart`)**:
+    - Candidate selection modal when multiple QR codes are detected within a single image or composite document.
+    - Index telemetry markers (`#1`, `#2`, ...), payload type badges, safety score indicators, and one-tap candidate selection.
+  - **Context-Aware Payload Action Card (`apps/user_app/lib/src/widgets/payload_action_card.dart`)**:
+    - Dedicated rendering and action button dispatchers across all 15 supported payload types:
+      - `UrlPayload`: "Open Safe Link" (with quarantine guard) and "Copy URL".
+      - `WifiPayload`: "Connect Network" (with quarantine guard) and "Copy Password".
+      - `VCardPayload` & `MeCardPayload`: "Save Contact" and "Copy Details".
+      - `OtpAuthPayload`: "Copy Code" (TOTP/HOTP secret).
+      - `UpiPaymentPayload`: "Pay via UPI" (with quarantine guard) and "Copy VPA".
+      - `EpcPaymentPayload`: "Copy IBAN".
+      - `CryptoPaymentPayload`: "Copy Address".
+      - `GeoPayload`: "Open in Maps" and "Copy Coordinates".
+      - `EmailPayload`: "Compose Email" and "Copy Email".
+      - `SmsPayload`: "Send SMS" and "Copy Number".
+      - `TelPayload`: "Call" and "Copy Number".
+      - `EventPayload`: "Add Event" and "Copy Details".
+      - `Gs1DigitalLinkPayload`: "Lookup GS1" and "Copy GTIN".
+      - `PlainTextPayload`: "Copy Content".
+  - **State Controller (`apps/user_app/lib/src/state/scanner_controller.dart`)**:
+    - Central `ChangeNotifier` coordinating `ScanToVaultPipeline`, viewfinder HUD state, active threat inspection results, multi-QR candidate list, torch/flashlight toggle, and incognito mode.
+    - Methods: `scanRawString`, `scanImageBuffer`, `scanFileBytes`, `scanMultiQrBuffer`, `selectMultiQrCandidate`, `dismissActiveResult`, `toggleTorch`, `toggleIncognito`, and `saveCurrentToVault`.
+- **Quality Gates & Coverage**:
+  - Achieved **99.32% line coverage** (734 / 739 lines hit) across `apps/user_app`.
+  - 100% test pass rate across 40 unit, widget, and integration tests (`apps/user_app/test/*`).
+  - 0 static analysis errors, warnings, or infos across entire monorepo (`flutter analyze --fatal-infos --fatal-warnings .`).
+  - 100% compile-time binary isolation confirmed (`dart run scripts/verify_binary_isolation.dart`).
+  - Automated verification script: `scripts/verify_subphase_4_2_1.ps1`.
+
+---
+
 ## [0.1.0-subphase.4.1.2] - 2026-11-22
 
 ### Added

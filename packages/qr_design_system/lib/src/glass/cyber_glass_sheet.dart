@@ -75,18 +75,21 @@ class CyberGlassSheet extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (title != null)
-                        Text(
-                          title!,
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.25,
-                              ),
+                        Expanded(
+                          child: Text(
+                            title!,
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.25,
+                                ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       if (trailing != null) trailing!,
                     ],
                   ),
                 ),
-              child,
+              Flexible(child: child),
             ],
           ),
         ),

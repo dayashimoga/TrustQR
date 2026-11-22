@@ -86,13 +86,16 @@ class TrustQrBadge extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            statusText,
-                            style: CyberTypography.monospace(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w800,
-                              color: color,
-                              letterSpacing: 1.0,
+                          Flexible(
+                            child: Text(
+                              statusText,
+                              style: CyberTypography.monospace(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                                color: color,
+                                letterSpacing: 1.0,
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           const SizedBox(width: 6),

@@ -101,13 +101,17 @@ class CyberButton extends StatelessWidget {
             Icon(icon, size: 18, color: fg),
             const SizedBox(width: 8),
           ],
-          Text(
-            label,
-            style: TextStyle(
-              color: fg,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.5,
+          Flexible(
+            child: Text(
+              label,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              style: TextStyle(
+                color: fg,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         ],
