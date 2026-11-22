@@ -17,6 +17,9 @@ export 'src/detector/qr_detector.dart';
 export 'src/detector/multi_qr_detector.dart';
 export 'src/isolate/isolate_qr_decoder.dart';
 export 'src/engine/universal_qr_scanner_engine.dart';
+export 'src/pipeline/pipeline_options.dart';
+export 'src/pipeline/pipeline_scan_result.dart';
+export 'src/pipeline/scan_to_vault_pipeline.dart';
 
 /// Configuration options for scanning pipelines.
 class ScannerOptions {
