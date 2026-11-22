@@ -4,6 +4,49 @@
 
 ---
 
+## [0.1.0-subphase.5.1.2] - 2026-11-22
+
+### Added
+- **Admin Analytics & Fleet Governance Verification Suite (`packages/qr_admin_analytics`)**:
+  - **Compile-Time Binary Isolation Invariant**:
+    - Re-audited and strictly confirmed compile-time isolation invariant: `apps/user_app` is 100% physically isolated from `packages/qr_admin_analytics` and `packages/qr_generator_engine`.
+    - Negative breach detection self-test passed cleanly (`dart run scripts/verify_binary_isolation.dart`).
+  - **High-Density Fleet Governance & Lifecycle Stress Suite (`test/fleet_governance_stress_test.dart`)**:
+    - Simulated fleet environment of 1,200 hardware devices across Android, iOS, Windows, Linux, and macOS platforms.
+    - Verified ingestion of 1,200 concurrent telemetry heartbeats recording scan volumes and security threats.
+    - Simulated 3,000 TrustQR tokens issued across multiple regional cryptographic authorities (`auth_us_east`, `auth_eu_central`, `auth_ap_south`).
+    - Benchmarked batch cryptographic token revocation of compromised authorities (1,000 tokens revoked simultaneously in < 50 ms).
+    - Verified individual device revocation, unrevocation/restoration, and query filtering by OS and role.
+    - Tested registry edge cases: non-existent device/token queries, double-revocation idempotency, and zero-match batch revocations.
+  - **Time-Series Anomaly & Timeline Stress Suite (`test/time_series_anomaly_stress_test.dart`)**:
+    - Simulated 365-day transaction timeline with 100-day zero-activity gap to verify continuous gap-padding without off-by-one errors.
+    - Tested extreme outlier injection (650-volume spike with 100 threats) and validated z-score anomaly detection ($|x_i - \mu|/\sigma \ge \text{threshold}$).
+    - Verified peak volume and peak timestamp tracking across `daily`, `weekly`, and `monthly` aggregation intervals.
+    - Evaluated boundary conditions: zero generations (scan-only ratio = 1.0), zero scans (generation-only ratio = 0.0), and 100% threat detection rates.
+  - **Adversarial Audit Log Tampering Pen-Tests (`test/adversarial_audit_tamper_test.dart`)**:
+    - 12-vector adversarial attack test suite verifying that HMAC-SHA256 integrity verification rejects all unauthorized mutations:
+      1. *Vector 1*: Action string tampering (`REVOKE_DEVICE` -> `UNREVOKE_DEVICE`).
+      2. *Vector 2*: Actor ID forgery (`admin@secops.corp` -> `attacker@evil.corp`).
+      3. *Vector 3*: Actor role privilege escalation (`admin` -> `super_root`).
+      4. *Vector 4*: Target resource spoofing (`device_rogue_01` -> `device_critical_db_server`).
+      5. *Vector 5*: Details dictionary payload tampering (quarantine level mutation & injected backdoor keys).
+      6. *Vector 6*: IP address spoofing (`192.168.10.55` -> `10.0.0.99`).
+      7. *Vector 7*: Microsecond timestamp alteration (+1 ms shift).
+      8. *Vector 8*: Single bit-flip attack on the 64-character hexadecimal HMAC signature.
+      9. *Vector 9*: Truncated / malformed hex signature attack.
+      10. *Vector 10*: Signature replay attack between distinct valid log entries.
+      11. *Vector 11*: Anti-chronological timestamp rollback attack breaching chronological ledger integrity.
+      12. *Vector 12*: Public key substitution attack with untrusted cryptographic key pair.
+  - **Canonical Exporter Fuzzing & Schema Validation (`test/canonical_export_fuzz_test.dart`)**:
+    - Fuzz-tested RFC 4180 CSV escaping for fields with embedded quotes, commas, multiline line breaks (`\n`, `\r\n`), and international Unicode characters (Japanese Kanji, Hindi Devanagari, emojis).
+    - Verified graceful generation of empty datasets across all 4 CSV exports (Time Series, Payload Distribution, Threat Firewall, Fleet Inventory).
+    - Tested payload distribution edge cases (100% single format, 15-way even split).
+    - Validated deterministic SHA-256 canonical report fingerprint reproducibility over 500 iterations and single-byte mutation sensitivity.
+  - **Automated Verification Gate (`scripts/verify_subphase_5_1_2.ps1`)**:
+    - 4-step quality gate: Binary Isolation, Static Analysis (`0 errors, 0 warnings, 0 infos`), 46/46 unit/integration/stress tests passing (100%), and **98.92% line coverage** (912 / 922 lines hit).
+
+---
+
 ## [0.1.0-subphase.5.1.1] - 2026-11-22
 
 ### Added

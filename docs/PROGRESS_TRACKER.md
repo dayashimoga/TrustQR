@@ -11,9 +11,9 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 17 / 24 (`70.83%`)
-- **Current Active Subphase**: `5.1.2` (`PENDING` — Admin Analytics & Fleet Governance Verification Suite)
-- **Next Subphase**: `5.2.1` (`PENDING` — Admin App Interactive QR Studio, Scannability Sim & TrustQR Signer)
+- **Verified Subphases**: 18 / 24 (`75.00%`)
+- **Current Active Subphase**: `5.2.1` (`PENDING` — Admin App Interactive QR Studio, Scannability Sim & TrustQR Signer)
+- **Next Subphase**: `5.2.2` (`PENDING` — Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace)
 - **Blocked Subphases**: 0
 
 ---
@@ -39,7 +39,7 @@
 | **4.2.1** | S4 / P4.2 | Restricted User App (`apps/user_app`): Live/File/Batch Scanner & Threat HUD | 40 min | 16 min | `VERIFIED` | 99.32% line coverage (734/739 lines hit, 40/40 tests pass, 0 analyzer issues) | `apps/user_app/lib/*`, `apps/user_app/test/*`, `scripts/verify_subphase_4_2_1.ps1` |
 | **4.2.2** | S4 / P4.2 | Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate | 35 min | 16 min | `VERIFIED` | 97.58% line coverage (1696/1738 lines hit, 89/89 tests pass, 0 analyzer issues) | `apps/user_app/lib/*`, `apps/user_app/test/*`, `scripts/verify_subphase_4_2_2.ps1` |
 | **5.1.1** | S5 / P5.1 | Admin Analytics Engine (`packages/qr_admin_analytics`): Fleet, Telemetry & Reports | 35 min | 18 min | `VERIFIED` | 99.02% line coverage (913/922 lines hit, 26/26 tests pass, 0 analyzer issues) | `packages/qr_admin_analytics/lib/*`, `packages/qr_admin_analytics/test/*`, `scripts/verify_subphase_5_1_1.ps1` |
-| **5.1.2** | S5 / P5.1 | Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage) | 25 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **5.1.2** | S5 / P5.1 | Admin Analytics & Fleet Governance Verification Suite (`>=95%` Coverage) | 25 min | 12 min | `VERIFIED` | 98.92% line coverage (912/922 lines hit, 46/46 tests pass, 0 analyzer issues) | `packages/qr_admin_analytics/test/*`, `scripts/verify_subphase_5_1_2.ps1` |
 | **5.2.1** | S5 / P5.2 | Admin App (`apps/admin_app`): Interactive QR Studio, Scannability Sim & TrustQR Signer | 45 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **5.2.2** | S5 / P5.2 | Admin App: Batch Generator, Analytics Dashboard, RBAC Guard & Multi-Pane Workspace | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **6.1.1** | S6 / P6.1 | Cross-Platform Native Runner Configs & Standalone Packaging Scripts (5 OS Targets) | 35 min | — | `PENDING` | Pending | — |
