@@ -4,6 +4,58 @@
 
 ---
 
+## [0.1.0-subphase.4.1.1] - 2026-11-22
+
+### Added
+- **Cyber-Precision Design Tokens & Themes (`packages/qr_design_system`)**:
+  - **Color Palette & Accents** (`lib/src/tokens/cyber_colors.dart`):
+    - Obsidian dark canvas (`#070A0F`), deep slate surface cards (`#0F172A`, `#1E293B`), and slate border sheens (`#334155`).
+    - Alabaster light theme surfaces (`#F8FAFC`, `#FFFFFF`, `#CBD5E1`).
+    - Neon semantic accent shaders: neon cyan (`#00F5FF`), emerald safe (`#00FF88`), amber caution (`#FFB800`), crimson critical threat (`#FF3366`), neon purple (`#B026FF`), and electric blue (`#0066FF`).
+    - Multi-tiered text typography colors and glassmorphic translucent sheens.
+  - **High-Tech Typography System** (`lib/src/tokens/cyber_typography.dart`):
+    - Complete `TextTheme` for display, title, body, and label hierarchies across dark and light modes.
+    - Specialized `monospace` typography for telemetry coordinates, cryptographic hashes, and token display.
+  - **Tokens & Themes** (`lib/src/tokens/cyber_tokens.dart`, `lib/src/tokens/cyber_theme.dart`):
+    - Corner radii (`radiusXs` to `radiusPill`), glassmorphic blur sigmas (`glassBlurSm` to `glassBlurLg`), border widths, spacing scales, and neon glow box shadows.
+    - Complete Material 3 `CyberTheme.dark()` and `CyberTheme.light()` ThemeData with CardThemeData, NavigationBarThemeData, NavigationRailThemeData, and AppBarThemeData.
+- **Glassmorphic Components (`packages/qr_design_system`)**:
+  - **Frosted Glass Container Card** (`lib/src/glass/cyber_glass_card.dart`):
+    - Translucent container with real `BackdropFilter` Gaussian blur (`ImageFilter.blur`), subtle border sheens, optional outer neon glow, and interactive ripple feedback (`onTap`).
+  - **Glassmorphic Sheet & Modal Container** (`lib/src/glass/cyber_glass_sheet.dart`):
+    - Frosted container with top drag handle, header title, trailing action slot, and backdrop blur for threat alerts and modal workflows.
+- **Interactive HUD Scanner Reticle (`packages/qr_design_system`)**:
+  - **Target Tracking Reticle** (`lib/src/reticle/hud_scanner_reticle.dart`):
+    - Animated viewport with 4 glowing corner tracking brackets drawn with `CustomPainter`.
+    - Continuous laser sweep scanline animation with gradient beam glow driven by an internal `AnimationController`.
+    - Subtle crosshair target ticks at center.
+    - Dynamic state transitions across 5 HUD states: `idle` (cyan steady), `scanning` (cyan laser sweep), `safe` (emerald green glow), `warning` (amber warning), and `threat` (crimson quarantine alarm).
+    - Status telemetry indicator tag with glowing pulse indicator dot.
+- **Specialized Cyber Components (`packages/qr_design_system`)**:
+  - **Futuristic Action Button** (`lib/src/widgets/cyber_button.dart`):
+    - 4 style variants (`primary`, `secondary`, `danger`, `outline`) with hover/active neon glow, accessibility semantics, and integrated loading spinner.
+  - **Semantic Status Badge** (`lib/src/widgets/cyber_badge.dart`):
+    - Pill or square badge with semantic color tiers (`neutral`, `safe`, `warning`, `threat`, `info`, `accent`) and optional pulsing dot indicator.
+  - **Animated Safety Score Gauge** (`lib/src/widgets/threat_score_gauge.dart`):
+    - Circular arc progress gauge animating from 0 to 100 with 3 color tiers: `SECURE` ($\ge 80$), `CAUTION` ($50–79$), and `CRITICAL` ($< 50$).
+  - **TrustQR Cryptographic Authenticity Badge** (`lib/src/widgets/trust_qr_badge.dart`):
+    - Authenticity badge supporting full card mode (displaying institution name, key ID, and verified status) and compact pill mode.
+- **Adaptive Responsive Layouts & Workspace Shell (`packages/qr_design_system`)**:
+  - **Form-Factor Breakpoints** (`lib/src/layout/responsive_layout.dart`):
+    - Compact mobile (`< 600px`), medium tablet (`600px – 1024px`), and expanded desktop (`> 1024px`) with `ResponsiveBuilder` and `ResponsiveLayout.value(...)`.
+  - **Adaptive Workspace Shell** (`lib/src/layout/adaptive_workspace_shell.dart`):
+    - Automatically switches layout:
+      - Mobile: Bottom `NavigationBar` with destination badges and action buttons.
+      - Tablet: Left `NavigationRail` and split-view layout (`secondaryPane`).
+      - Desktop: Full 240px navigation sidebar with headers and status badges, central workspace, and optional 360px inspector pane.
+    - Keyboard shortcut bindings for desktop productivity: `Ctrl/Cmd+O` (Open), `Ctrl/Cmd+S` (Scan/Save), `Ctrl/Cmd+F` (Search), `Ctrl/Cmd+G` (Generate), and `Ctrl+1..9` (tab switching).
+- **Quality Gates & Automated Verification**:
+  - Authored comprehensive test suite in `packages/qr_design_system/test/`: `cyber_theme_test.dart`, `glassmorphic_widgets_test.dart`, `hud_reticle_test.dart`, `cyber_components_test.dart`, and `adaptive_workspace_test.dart` (37 tests).
+  - Achieved **98.99% line coverage** (587 / 593 lines hit) across `packages/qr_design_system`.
+  - Created automated gate script `scripts/verify_subphase_4_1_1.ps1` verifying 0 static analysis errors/warnings/infos, 37/37 tests passing, and 100% binary isolation.
+
+---
+
 ## [0.1.0-subphase.3.2.2] - 2026-11-22
 
 ### Added

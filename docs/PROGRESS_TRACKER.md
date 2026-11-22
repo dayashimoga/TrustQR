@@ -11,9 +11,9 @@
 - **Total Stages**: 6
 - **Total Phases**: 12
 - **Total Subphases**: 24
-- **Verified Subphases**: 12 / 24 (`50.00%`)
-- **Current Active Subphase**: `4.1.1` (`PENDING` — Cyber-Precision Glassmorphic Design System)
-- **Next Subphase**: `4.1.2` (`PENDING` — WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests)
+- **Verified Subphases**: 13 / 24 (`54.17%`)
+- **Current Active Subphase**: `4.1.2` (`PENDING` — WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests)
+- **Next Subphase**: `4.2.1` (`PENDING` — Restricted User App: Live/File/Batch Scanner & Threat HUD)
 - **Blocked Subphases**: 0
 
 ---
@@ -34,7 +34,7 @@
 | **3.1.2** | S3 / P3.1 | Integrated Scan-to-Firewall-to-Vault Pipeline & Decoding Performance Benchmarks | 30 min | 14 min | `VERIFIED` | 99.31% line coverage (1433/1443 lines hit, 94/94 tests pass, < 25 ms latency gate pass, 0 analyzer issues) | `packages/qr_scanner_engine/lib/src/pipeline/*`, `test/pipeline/*`, `test/benchmark/*`, `scripts/verify_subphase_3_1_2.ps1` |
 | **3.2.1** | S3 / P3.2 | Admin-Only Artistic QR Matrix Encoder, Shaders, Gradients, Logos & Branded Templates | 40 min | 16 min | `VERIFIED` | 98.70% line coverage (908/920 lines hit, 37/37 tests pass, 100% round-trip decoded, 0 analyzer issues) | `packages/qr_generator_engine/lib/src/*`, `test/*`, `scripts/verify_subphase_3_2_1.ps1` |
 | **3.2.2** | S3 / P3.2 | Real-Time Scannability & Contrast Simulator + PNG, Vector SVG, PDF & Batch Exporter | 35 min | 16 min | `VERIFIED` | 98.37% line coverage (1571/1597 lines hit, 67/67 tests pass, 100% round-trip decoded, 0 analyzer issues) | `packages/qr_generator_engine/lib/src/{simulator,export}/*`, `test/export_and_simulator_test.dart`, `scripts/verify_subphase_3_2_2.ps1` |
-| **4.1.1** | S4 / P4.1 | Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
+| **4.1.1** | S4 / P4.1 | Cyber-Precision Glassmorphic Design System, HUD Scanner Reticle & Adaptive Layouts | 35 min | 16 min | `VERIFIED` | 98.99% line coverage (587/593 lines hit, 37/37 tests pass, 0 analyzer issues) | `packages/qr_design_system/lib/src/*`, `test/*`, `scripts/verify_subphase_4_1_1.ps1` |
 | **4.1.2** | S4 / P4.1 | WCAG Accessibility Semantics, Multi-Language Localization (i18n) & Widget Tests | 30 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **4.2.1** | S4 / P4.2 | Restricted User App (`apps/user_app`): Live/File/Batch Scanner & Threat HUD | 40 min | — | `PENDING` | Pending (`>=95%` target) | — |
 | **4.2.2** | S4 / P4.2 | Restricted User App: Offline Vault, Smart Collections, Privacy Mode & Isolation Gate | 35 min | — | `PENDING` | Pending (`>=95%` target) | — |
